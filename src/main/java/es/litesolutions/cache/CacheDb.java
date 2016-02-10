@@ -1,7 +1,10 @@
 package es.litesolutions.cache;
 
+import com.github.fge.lambdas.functions.ThrowingFunction;
+import com.intersys.classes.Dictionary.ClassDefinition;
 import com.intersys.objects.CacheDatabase;
 import com.intersys.objects.CacheException;
+import com.intersys.objects.CacheQuery;
 import com.intersys.objects.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +23,9 @@ public final class CacheDb
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheDb.class);
 
-    private static final String JDBC_URL_TEMPLATE = "jdbc:Cache://%s:%s/%s";
-
     private final Database database;
 
-    private CacheDb(final String jdbcUrl, final String user,
+    public CacheDb(final String jdbcUrl, final String user,
         final String password)
         throws CacheException
     {
@@ -39,6 +40,20 @@ public final class CacheDb
     public Database getDatabase()
     {
         return database;
+    }
+
+    /**
+     * Get a closeable query from the database
+     *
+     * @param function the function for obtaining the query (example: {@link
+     * ClassDefinition#query_Summary(Database)}
+     * @return the query
+     */
+    public CacheSqlQuery query(
+        final ThrowingFunction<Database, CacheQuery> function)
+    {
+        final CacheQuery query = function.apply(database);
+        return new CacheSqlQuery(query);
     }
 
     @Override
