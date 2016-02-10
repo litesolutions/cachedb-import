@@ -1,0 +1,25 @@
+apply(plugin: "java");
+
+group = "es.litesolutions";
+version = "0.1.0-SNAPSHOT";
+description = "Read an XML export, write as COS source files";
+
+def javaVersion = JavaVersion.VERSION_1_8;
+sourceCompatibility = javaVersion;
+targetCompatibility = javaVersion; // defaults to sourceCompatibility
+
+dependencies {
+    compile fileTree("lib");
+}
+
+test {
+    useTestNG() {
+        useDefaultListeners = true;
+    };
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "2.11";
+    distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip";
+}
+
