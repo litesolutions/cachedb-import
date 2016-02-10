@@ -64,9 +64,6 @@ public final class Main
         ) {
             while (rs.next())
                 System.out.println(rs.getString(SQL_CLASSNAME_FIELD));
-        } catch (CacheException e) {
-            System.err.println(e.getCause());
-            throw e;
         }
     }
 
