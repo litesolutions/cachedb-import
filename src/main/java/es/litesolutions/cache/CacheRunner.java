@@ -12,6 +12,7 @@ import com.intersys.objects.StringHolder;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -29,6 +30,8 @@ import java.util.Set;
  */
 public final class CacheRunner
 {
+    private static final String CRLF = "\r\n";
+
     private static final String CLASSDEFINITION_NAME_SQLFIELD = "Name";
 
     private static final String LOADSTREAM_CLASSNAME = "%SYSTEM.OBJ";
@@ -36,6 +39,11 @@ public final class CacheRunner
 
     private static final String LOADFILE_CLASSNAME = "%SYSTEM.OBJ";
     private static final String LOADFILE_METHODNAME = "Load";
+
+    private static final String WRITECLASSCONTENT_CLASSNAME
+        = "%Compiler.UDL.TextServices";
+    private static final String WRITECLASSCONTENT_METHODNAME
+        = "GetTextAsString";
 
     private final CacheDb cacheDb;
 
@@ -229,6 +237,40 @@ public final class CacheRunner
 //            loadedlist.set(result[2].getString());
 //            System.out.println("loadedlist: " + loadedlist.getValue());
 
+    }
+
+    public void writeClassContent(final String className, final Path path)
+        throws CacheException, IOException
+    {
+        final Database db = cacheDb.getDatabase();
+
+        final int[] byRefs = new int[1];
+        byRefs[0] = 3;
+        final StringHolder holder = new StringHolder("");
+
+        final Dataholder[] arguments = new Dataholder[4];
+        arguments[0] = new Dataholder((String) null);
+        arguments[1] = new Dataholder(className);
+        arguments[2] = Dataholder.create(holder.value);
+        arguments[3] = new Dataholder(CRLF);
+
+        final Dataholder[] res = db.runClassMethod(
+            WRITECLASSCONTENT_CLASSNAME,
+            WRITECLASSCONTENT_METHODNAME,
+            byRefs,
+            arguments,
+            Database.RET_PRIM
+        );
+
+        db.parseStatus(res[0]);
+
+        holder.set(res[1].getString());
+
+        try (
+            final Writer writer = Files.newBufferedWriter(path);
+        ) {
+            writer.write(holder.value);
+        }
     }
 
     private static void loadContent(final CharacterStream stream,
