@@ -67,7 +67,7 @@ public final class Main
 
             final Set<String> imported = new HashSet<>(after);
             imported.removeAll(before);
-            System.out.println(imported);
+            imported.forEach(System.out::println);
         }
     }
 
