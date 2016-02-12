@@ -2,8 +2,10 @@ package es.litesolutions.cache;
 
 import com.github.fge.lambdas.functions.ThrowingFunction;
 import com.intersys.cache.Dataholder;
+import com.intersys.cache.SysDatabase;
 import com.intersys.classes.CharacterStream;
 import com.intersys.classes.Dictionary.ClassDefinition;
+import com.intersys.classes.File;
 import com.intersys.classes.FileCharacterStream;
 import com.intersys.classes.GlobalCharacterStream;
 import com.intersys.objects.CacheException;
@@ -149,6 +151,9 @@ public final class CacheRunner
 
         final FileCharacterStream stream = new FileCharacterStream(db);
 
+        Dataholder[] args = new Dataholder[]{new Dataholder("xml")};
+        Dataholder res = db.runClassMethod("%File", "TempFilename", args, 0);
+        stream._filenameSet(res.getString());
 
         loadContent(stream, path);
 
@@ -184,7 +189,7 @@ public final class CacheRunner
         // arg 1: file name
         arguments[0] = Dataholder.create(remoteFileName);
         // arg 2: qspec; we want to ensure that compile works, at least
-        arguments[1] = new Dataholder("c");
+        arguments[1] = new Dataholder("d");
         // arg 3: errorlog
         arguments[2] = Dataholder.create(errorlog.value);
         // arg 4: loadedlist
@@ -219,15 +224,11 @@ public final class CacheRunner
         /*
          * - others are ByRef arguments
          */
-        // FIXME: not filled correctly... No idea if this is a bug with
-        // InterSystems jars or not. See the README for more details.
-        // Ideally this should return a Set<String> containing the loaded
-        // classes names...
-//            errorlog.set(result[1].getString());
-//            System.out.println("errorlog: " + errorlog.getValue());
-//
-//            loadedlist.set(result[2].getString());
-//            System.out.println("loadedlist: " + loadedlist.getValue());
+        errorlog.set(result[1].getString());
+        System.out.println("errorlog: " + errorlog.getValue());
+
+        loadedlist.set(result[2].getString());
+        System.out.println("loadedlist: " + loadedlist.getValue());
 
     }
 
