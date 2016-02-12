@@ -61,13 +61,7 @@ public final class Main
             final CacheDb db = new CacheDb(jdbcUrl, user, password);
         ) {
             final CacheRunner runner = new CacheRunner(db);
-            final Set<String> before = runner.listClasses();
-            runner.importXml(toImport);
-            final Set<String> after = runner.listClasses();
-
-            final Set<String> imported = new HashSet<>(after);
-            imported.removeAll(before);
-            imported.forEach(System.out::println);
+            runner.importXml2(toImport);
         }
     }
 
