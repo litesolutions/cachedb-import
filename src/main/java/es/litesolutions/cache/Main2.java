@@ -8,16 +8,10 @@ import com.intersys.objects.StringHolder;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 
 public final class Main2
 {
@@ -33,27 +27,13 @@ public final class Main2
 
     private static final String JDBC_URL_TEMPLATE = "jdbc:Cache://%s:%s/%s";
 
-    private static final ThreadFactory THREAD_FACTORY = r -> {
-        final Thread t = new Thread(r);
-        t.setDaemon(true);
-        t.setName("file-read");
-        return t;
-    };
-
-    private static final int NR_CPUS
-        = Runtime.getRuntime().availableProcessors();
-
-    private static final ExecutorService EXECUTOR
-        = Executors.newFixedThreadPool(NR_CPUS, THREAD_FACTORY);
-
     private Main2()
     {
         throw new Error("instantiation not permitted");
     }
 
     public static void main(final String... args)
-        throws IOException, CacheException, ExecutionException,
-        InterruptedException
+        throws IOException, CacheException
     {
         if (args.length == 0)
             throw new IllegalArgumentException("missing arguments");
@@ -85,8 +65,7 @@ public final class Main2
             final GlobalCharacterStream stream
                 = new GlobalCharacterStream(db.getDatabase());
 
-            final Future<Void> future
-                = EXECUTOR.submit(() -> loadFile(stream, loadedFile));
+            loadContent(stream, loadedFile);
 
             /*
              * Arguments for class "%SYSTEM.OBJ", class method "LoadStream"
@@ -153,32 +132,26 @@ public final class Main2
 
             loadedlist.set(result[2].getString());
             System.out.println("loadedlist: " + loadedlist.getValue());
-
-            /*
-             * Check the load
-             */
-            future.get();
         }
-
-        EXECUTOR.shutdownNow();
     }
 
-    private static Void loadFile(final GlobalCharacterStream stream,
+    private static void loadContent(final GlobalCharacterStream stream,
         final Path path)
-        throws CacheException, IOException
+        throws IOException, CacheException
     {
+        final StringBuilder sb = new StringBuilder();
+
         try (
             final Reader reader = Files.newBufferedReader(path);
-            final Writer writer = stream.getWriter();
         ) {
-            final char buf[] = new char[2048];
+            final char[] buf = new char[2048];
             int nrChars;
 
             while ((nrChars = reader.read(buf)) != -1)
-                writer.write(buf, 0, nrChars);
+                sb.append(buf, 0, nrChars);
         }
 
-        return null;
+        stream._write(sb.toString());
     }
 
     private static String readProperty(final Properties properties,
