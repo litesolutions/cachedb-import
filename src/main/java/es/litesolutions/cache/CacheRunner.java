@@ -142,13 +142,13 @@ public final class CacheRunner
 //        System.out.println("loadedlist: " + loadedlist.getValue());
     }
 
+    // DOESN'T WORK :(
     public void importXml2(final Path path)
         throws CacheException, IOException
     {
         final Database db = cacheDb.getDatabase();
 
         final FileCharacterStream stream = new FileCharacterStream(db);
-
 
         loadContent(stream, path);
 
