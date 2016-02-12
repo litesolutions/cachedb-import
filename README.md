@@ -20,7 +20,7 @@ class](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cl
 * import an XML file (this is done using [this
   method](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25SYSTEM.OBJ#METHOD_LoadStream));
 * write a class to a plain file (this is done using [this
-* method](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25Compiler.UDL.TextServices#METHOD_GetTextAsString);
+  method](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25Compiler.UDL.TextServices#METHOD_GetTextAsString);
   note, code not committed yet).
 
 Unfortunately, while the import works, [it appears to be impossible to obtain the
