@@ -1,6 +1,5 @@
 package es.litesolutions.cache;
 
-import com.intersys.classes.Dictionary.ClassDefinition;
 import com.intersys.objects.CacheException;
 
 import java.io.IOException;
@@ -8,9 +7,10 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 public final class Main
 {
@@ -19,13 +19,12 @@ public final class Main
     private static final String CACHEDB_USER = "cachedb.user";
     private static final String CACHEDB_PASSWORD = "cachedb.password";
     private static final String CACHEDB_NAMESPACE = "cachedb.namespace";
+    private static final String LOADEDFILE = "loadedFile";
 
     private static final String CACHEDB_HOST_DEFAULT = "localhost";
     private static final String CACHEDB_PORT_DEFAULT = "1972";
 
     private static final String JDBC_URL_TEMPLATE = "jdbc:Cache://%s:%s/%s";
-
-    private static final String SQL_CLASSNAME_FIELD = "Name";
 
     private Main()
     {
@@ -55,15 +54,20 @@ public final class Main
 
         final String user = readProperty(properties, CACHEDB_USER);
         final String password = readProperty(properties, CACHEDB_PASSWORD);
+        final String loadedFile = readProperty(properties, LOADEDFILE);
+        final Path toImport = Paths.get(loadedFile).toRealPath();
 
         try (
             final CacheDb db = new CacheDb(jdbcUrl, user, password);
-            final CacheSqlQuery query
-                = db.query(ClassDefinition::query_Summary);
-            final ResultSet rs = query.execute();
         ) {
-            while (rs.next())
-                System.out.println(rs.getString(SQL_CLASSNAME_FIELD));
+            final CacheRunner runner = new CacheRunner(db);
+            final Set<String> before = runner.listClasses();
+            runner.importXml(toImport);
+            final Set<String> after = runner.listClasses();
+
+            final Set<String> imported = new HashSet<>(after);
+            imported.removeAll(before);
+            System.out.println(imported);
         }
     }
 

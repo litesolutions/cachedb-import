@@ -93,14 +93,14 @@ public final class CacheRunner
              */
         // arg 1: stream
         arguments[0] = Dataholder.create(stream);
-        // arg 2: qspec; the default, therefore null
-        arguments[1] = new Dataholder((String) null);
+        // arg 2: qspec; we want to ensure that compile works, at least
+        arguments[1] = new Dataholder("c");
         // arg 3: errorlog
         arguments[2] = Dataholder.create(errorlog.value);
         // arg 4: loadedlist
         arguments[3] = Dataholder.create(loadedlist.value);
         // arg 5: listonly; we want true
-        arguments[4] = Dataholder.create(Boolean.TRUE);
+        arguments[4] = Dataholder.create(Boolean.FALSE);
         // arg 6: selecteditems; nothing
         arguments[5] = Dataholder.create(null);
         // arg 7: displayname. For logging...
