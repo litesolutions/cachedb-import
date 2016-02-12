@@ -14,8 +14,14 @@ Work in progress...
 
 What is done right now is:
 
-* list the available classes in a namespace;
-* import an XML file.
+* list the available classes in a namespace (this is done using [the Java
+  binding for this
+class](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25Dictionary.ClassDefinitionQuery));
+* import an XML file (this is done using [this
+  method](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25SYSTEM.OBJ#METHOD_LoadStream));
+* write a class to a plain file (this is done using [this
+* method](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25Compiler.UDL.TextServices#METHOD_GetTextAsString);
+  note, code not committed yet).
 
 Unfortunately, while the import works, [it appears to be impossible to obtain the
 list of imported classes](http://stackoverflow.com/q/35360116/1093528).
