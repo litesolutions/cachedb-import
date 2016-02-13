@@ -1,46 +1,27 @@
-Usage: java -jar thejar -cp cp command [cfg=somefile] [arg1=value1 ...]
+Syntax: java ... <command> [cfg=somefile] [arg=value ...]
 
-COMMAND ARGUMENTS:
+The command argument is mandatory; available commands, and their arguments, are
+specified below.
 
-    * thejar [MANDATORY]
+If a configuration file is specified, using cfg=..., then arguments are read
+from this file. The configuration file is expected to be a Java properties file,
+ENCODED IN UTF-8 (this is the 21st century, after all).
 
-        Path to the jar; typically, this will be build/libs/cachedb-import.jar.
+The rule is that if a property is defined in this file, but also at the command
+line, then the command line takes precedence.
 
-    * cp [MANDATORY]
-
-        Classpath to both the cachejdbc.jar and cachedb.jar from your Caché
-        installation.
-
-    * command [MANDATORY]
-
-        See below.
-
-    * arg1=value1 etc [OPTIONAL]
-
-        Arguments wich are either global to the program or command-specific.
+Typically, you want to use this file to define the database connection data. See
+below.
 
 COMMANDS:
 
     * listClasses: list available classes on a given namespace.
+    * export: write the class definitions of a given namespace as plain source
+      files in a directory of your choice.
 
-GLOBAL ARGUMENTS:
+GLOBAL ARGUMENTS
 
-    * cfg=somefile [OPTIONAL]
-
-        Read arguments from a file specified by somefile, if any. The loading
-        order is:
-
-        * if this parameter is specified, further arguments will be loaded from
-          this file;
-        * if this argument does not exist, or this parameter is not specified,
-          the program tries and find a file named cachedb.properties in
-          the process's working directory.
-
-        This file should be readable as a Java property file. NOTE THAT THE
-        EXPECTED ENCODING IS UTF-8, NOT ISO-8859-1 (this is 2016+, afer all).
-
-        Also note that if a property is specified both by this file and on the
-        command line, THE COMMAND LINE TAKES PRECEDENCE.
+    The following arguments are defined for all commands.
 
     * verbose=<true|false> [OPTIONAL]
 
@@ -71,4 +52,47 @@ GLOBAL ARGUMENTS:
         particular namespace, along with execution privileges on the %SYS
         namespace.
 
+COMMAND: listClasses
 
+    This command will just list all classes in a given
+    database/user/password/namespace.
+
+    The result of the list will be output to the standard output.
+
+    OPTIONS:
+
+        * none.
+
+COMMAND: export
+
+    This command will write, as plain text files, all class contents in a
+    given database/user/password/namespace environment into a directory.
+
+    Subdirectories will be created on demand; that is, a class named A.B.C
+    will be saved as A/B/C.cls in the target directory.
+
+    This command expects an output directory to write the files to, see below.
+    If the directory already exists, an error will be thrown, unless this
+    command has been explicitly instructed to overwrite all contents; again, see
+    below.
+
+    Note that all written files will be written using UTF-8 as a character
+    coding.
+
+    OPTIONS:
+
+        * outputDir=someDir [MANDATORY]
+
+            Tells where the output files should be written. The directory must
+            not be existing, except if the overwrite option is true.
+
+        * overwrite=<true|false> [OPTIONAL]
+
+            Tells what should happen if the directory already exists. FALSE IS
+            THE DEFAULT.
+
+            If false, then if the file exists (even if it's not a directory),
+            the command fails.
+
+            If true, the directory or file will be deleted (recursively so if it
+            actually is a directory) before being created again.
