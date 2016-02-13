@@ -1,11 +1,11 @@
 package es.litesolutions.cache;
 
-import com.github.fge.lambdas.functions.ThrowingFunction;
 import com.intersys.classes.Dictionary.ClassDefinition;
 import com.intersys.objects.CacheDatabase;
 import com.intersys.objects.CacheException;
 import com.intersys.objects.CacheQuery;
 import com.intersys.objects.Database;
+import es.litesolutions.cache.util.CacheQueryProvider;
 
 /**
  * Wrapper over a Caché {@link Database}
@@ -41,14 +41,14 @@ public final class CacheDb
     /**
      * Get a closeable query from the database
      *
-     * @param function the function for obtaining the query (example: {@link
+     * @param provider the function for obtaining the query (example: {@link
      * ClassDefinition#query_Summary(Database)}
      * @return the query
      */
-    public CacheSqlQuery query(
-        final ThrowingFunction<Database, CacheQuery> function)
+    public CacheSqlQuery query(final CacheQueryProvider provider)
+        throws CacheException
     {
-        final CacheQuery query = function.apply(database);
+        final CacheQuery query = provider.getQuery(database);
         return new CacheSqlQuery(query);
     }
 

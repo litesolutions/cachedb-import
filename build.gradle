@@ -26,8 +26,6 @@ targetCompatibility = javaVersion; // defaults to sourceCompatibility
 
 dependencies {
     compile fileTree("lib");
-    compile(group: "com.github.fge", name: "throwing-lambdas",
-        version: "0.5.0");
     compile(group: "com.github.fge", name: "java7-fs-more",
         version: "0.2.0");
 }

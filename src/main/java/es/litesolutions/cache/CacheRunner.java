@@ -1,6 +1,5 @@
 package es.litesolutions.cache;
 
-import com.github.fge.lambdas.functions.ThrowingFunction;
 import com.intersys.cache.Dataholder;
 import com.intersys.classes.BinaryStream;
 import com.intersys.classes.CharacterStream;
@@ -11,6 +10,7 @@ import com.intersys.classes.GlobalCharacterStream;
 import com.intersys.objects.CacheException;
 import com.intersys.objects.Database;
 import com.intersys.objects.StringHolder;
+import es.litesolutions.cache.util.CacheQueryProvider;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -27,7 +27,7 @@ import java.util.Set;
  * A wrapper class for the necessary methods run by this program
  *
  * <p>This program takes a {@link CacheDb} as an argument (instead of a plain
- * {@link Database}) since the former's {@link CacheDb#query(ThrowingFunction)
+ * {@link Database}) since the former's {@link CacheDb#query(CacheQueryProvider)
  * query method} is needed.</p>
  */
 public final class CacheRunner
