@@ -54,6 +54,11 @@ public final class CachedbImport
         COMMANDS = Collections.unmodifiableMap(map);
     }
 
+    private CachedbImport()
+    {
+        throw new Error("instantiation not permitted");
+    }
+
     public static void main(final String... args)
         throws IOException, CacheException, SQLException
     {
