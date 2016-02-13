@@ -65,8 +65,14 @@ public final class CacheRunner
                 = cacheDb.query(ClassDefinition::query_Summary);
             final ResultSet rs = query.execute();
         ) {
-            while (rs.next())
-                set.add(rs.getString(CLASSDEFINITION_NAME_SQLFIELD));
+            while (rs.next()) {
+                final String name = rs.getString(CLASSDEFINITION_NAME_SQLFIELD);
+                /*
+                 * FIXME: meh, that would be better done at the query level
+                 */
+                if (name.charAt(0) != '%')
+                    set.add(name);
+            }
         }
 
         return Collections.unmodifiableSet(set);
