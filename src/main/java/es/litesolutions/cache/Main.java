@@ -8,9 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 public final class Main
 {
@@ -61,7 +59,7 @@ public final class Main
             final CacheDb db = new CacheDb(jdbcUrl, user, password);
         ) {
             final CacheRunner runner = new CacheRunner(db);
-            runner.importXml2(toImport);
+            runner.importXml3(toImport);
         }
     }
 
