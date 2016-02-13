@@ -13,8 +13,6 @@ repositories {
 }
 
 apply(plugin: "java");
-apply(plugin: "application");
-apply(plugin: "com.github.johnrengelman.shadow");
 
 group = "es.litesolutions";
 version = "0.1.0-SNAPSHOT";
@@ -26,8 +24,6 @@ targetCompatibility = javaVersion; // defaults to sourceCompatibility
 
 dependencies {
     compile fileTree("lib");
-    compile(group: "com.github.fge", name: "java7-fs-more",
-        version: "0.2.0");
 }
 
 test {

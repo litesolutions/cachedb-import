@@ -1,8 +1,7 @@
 package es.litesolutions.cache;
 
-import com.github.fge.filesystem.MoreFiles;
-import com.github.fge.filesystem.RecursionMode;
 import com.intersys.objects.CacheException;
+import es.litesolutions.cache.util.RmDashRf;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -62,7 +61,7 @@ public final class ExportTest
         final Path baseDir = Paths.get(args[1]).toAbsolutePath();
 
         if (Files.exists(baseDir))
-            MoreFiles.deleteRecursive(baseDir, RecursionMode.FAIL_FAST);
+            RmDashRf.rmDashRf(baseDir);
 
         Files.createDirectories(baseDir);
 
