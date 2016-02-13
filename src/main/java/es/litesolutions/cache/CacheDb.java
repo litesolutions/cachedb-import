@@ -6,8 +6,6 @@ import com.intersys.objects.CacheDatabase;
 import com.intersys.objects.CacheException;
 import com.intersys.objects.CacheQuery;
 import com.intersys.objects.Database;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper over a Caché {@link Database}
@@ -21,8 +19,6 @@ import org.slf4j.LoggerFactory;
 public final class CacheDb
     implements AutoCloseable
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CacheDb.class);
-
     private final Database database;
 
     public CacheDb(final String jdbcUrl, final String user,
@@ -63,6 +59,7 @@ public final class CacheDb
         final int count = database.close().size();
 
         if (count > 0)
-            LOGGER.error("{} objects not freed when closing database", count);
+            System.err.printf("%d objects not freed when closing database",
+                count);
     }
 }
