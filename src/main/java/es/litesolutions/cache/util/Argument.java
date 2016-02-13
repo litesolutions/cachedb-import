@@ -16,8 +16,8 @@ public final class Argument
         Objects.requireNonNull(map);
         final String value = map.get(key);
         if (value == null)
-            throw new IllegalArgumentException("required argument " + key
-                + " is missing");
+            throw new IllegalArgumentException("required argument '" + key
+                + "' is missing");
         return value;
     }
 

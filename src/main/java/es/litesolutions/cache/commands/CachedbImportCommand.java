@@ -1,11 +1,9 @@
 package es.litesolutions.cache.commands;
 
-import com.intersys.objects.CacheException;
 import es.litesolutions.cache.CacheDb;
 import es.litesolutions.cache.CacheRunner;
 import es.litesolutions.cache.util.Argument;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 public abstract class CachedbImportCommand
@@ -24,7 +22,7 @@ public abstract class CachedbImportCommand
     }
 
     public abstract void execute()
-        throws CacheException, SQLException;
+        throws Exception;
 
     protected final String getArgument(final String name)
     {

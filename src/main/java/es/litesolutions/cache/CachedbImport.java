@@ -1,7 +1,7 @@
 package es.litesolutions.cache;
 
-import com.intersys.objects.CacheException;
 import es.litesolutions.cache.commands.CachedbImportCommand;
+import es.litesolutions.cache.commands.ExportCommand;
 import es.litesolutions.cache.commands.ListClassesCommand;
 import es.litesolutions.cache.util.Argument;
 
@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +49,7 @@ public final class CachedbImport
         final Map<String, CommandCreator> map = new HashMap<>();
 
         map.put("listClasses", ListClassesCommand::new);
+        map.put("export", ExportCommand::new);
 
         COMMANDS = Collections.unmodifiableMap(map);
     }
@@ -60,7 +60,7 @@ public final class CachedbImport
     }
 
     public static void main(final String... args)
-        throws IOException, CacheException, SQLException
+        throws Exception
     {
         if (args.length < 1) {
             readHelp();
