@@ -2,10 +2,8 @@ package es.litesolutions.cache;
 
 import com.github.fge.lambdas.functions.ThrowingFunction;
 import com.intersys.cache.Dataholder;
-import com.intersys.cache.SysDatabase;
 import com.intersys.classes.CharacterStream;
 import com.intersys.classes.Dictionary.ClassDefinition;
-import com.intersys.classes.File;
 import com.intersys.classes.FileCharacterStream;
 import com.intersys.classes.GlobalCharacterStream;
 import com.intersys.objects.CacheException;
@@ -156,13 +154,12 @@ public final class CacheRunner
     public void importXml2(final Path path)
         throws CacheException, IOException
     {
+        final String tempFileName = createRemoteTemporaryFileName();
+
         final Database db = cacheDb.getDatabase();
 
         final FileCharacterStream stream = new FileCharacterStream(db);
-
-        Dataholder[] args = new Dataholder[]{new Dataholder("xml")};
-        Dataholder res = db.runClassMethod("%File", "TempFilename", args, 0);
-        stream._filenameSet(res.getString());
+        stream._filenameSet(tempFileName);
 
         loadContent(stream, path);
 
@@ -273,6 +270,15 @@ public final class CacheRunner
         ) {
             writer.write(holder.value);
         }
+    }
+
+    private String createRemoteTemporaryFileName()
+        throws CacheException
+    {
+        final Dataholder[] args = {new Dataholder("xml")};
+        final Dataholder res = cacheDb.getDatabase()
+            .runClassMethod("%File", "TempFilename", args, 0);
+        return res.getString();
     }
 
     private static void loadContent(final CharacterStream stream,
