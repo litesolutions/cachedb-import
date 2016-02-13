@@ -21,6 +21,6 @@ public final class ListClassesCommand
         throws CacheException, SQLException
     {
         final Set<String> set = runner.listClasses();
-        set.forEach(System.out::println);
+        set.stream().sorted().forEach(System.out::println);
     }
 }
