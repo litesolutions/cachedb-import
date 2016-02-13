@@ -21,7 +21,7 @@ COMMAND ARGUMENTS:
 
 COMMANDS:
 
-    TODO
+    * listClasses: list available classes on a given namespace.
 
 GLOBAL ARGUMENTS:
 
@@ -37,11 +37,33 @@ GLOBAL ARGUMENTS:
         Also note that if a property is specified both by this file and on the
         command line, THE SPECIFICATION ON THE COMMAND LINE TAKES PRECEDENCE.
 
-    * verbose=<true|false>
+    * verbose=<true|false> [OPTIONAL]
 
         Augment the verbosity level of the program. The default is false.
 
+    * host=dbhost [OPTIONAL]
 
+        Specify the host where the Caché installation is hosted. If not
+        specified, the default is localhost.
 
+    * port=dbport [OPTIONAL]
+
+        Specify the port to connect to. If not specified, the default is 1972.
+
+    * user=dbuser [MANDATORY]
+
+         Specify the user with which to connect to the database.
+
+    * password=dbpassword [MANDATORY]
+
+        Specify the password for the Caché database user.
+
+    * namespace=somenamespace [MANDATORY]
+
+        Specify the namespace this user must try and connect to.
+
+        Note that the user/password pair must have full access to this
+        particular namespace, along with execution privileges on the %SYS
+        namespace.
 
 
