@@ -1,4 +1,4 @@
-Usage: java -jar thejar -cp cp command arg1=value1 arg2=value2 ...
+Usage: java -jar thejar -cp cp command [cfg=somefile] [arg1=value1 ...]
 
 COMMAND ARGUMENTS:
 
@@ -27,15 +27,20 @@ GLOBAL ARGUMENTS:
 
     * cfg=somefile [OPTIONAL]
 
-        Read all subsequent arguments from a file specified by somefile, if any.
-        If no such file is found, the program will try and load a file named
-        cachedb.properties from the process's working directory.
+        Read arguments from a file specified by somefile, if any. The loading
+        order is:
+
+        * if this parameter is specified, further arguments will be loaded from
+          this file;
+        * if this argument does not exist, or this parameter is not specified,
+          the program tries and find a file named cachedb.properties in
+          the process's working directory.
 
         This file should be readable as a Java property file. NOTE THAT THE
         EXPECTED ENCODING IS UTF-8, NOT ISO-8859-1 (this is 2016+, afer all).
 
         Also note that if a property is specified both by this file and on the
-        command line, THE SPECIFICATION ON THE COMMAND LINE TAKES PRECEDENCE.
+        command line, THE COMMAND LINE TAKES PRECEDENCE.
 
     * verbose=<true|false> [OPTIONAL]
 
