@@ -53,7 +53,7 @@ public final class CacheRunner
         = "GetTextAsString";
 
     private static final String FILE_CLASSNAME = "%File";
-    private static final String FILE_METHODNAME = "TempFileName";
+    private static final String FILE_METHODNAME = "TempFilename";
 
     private final CacheDb cacheDb;
 
