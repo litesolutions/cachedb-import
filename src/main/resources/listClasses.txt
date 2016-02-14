@@ -1,9 +1,9 @@
 Syntax:
 
-    java <javaoption> listClasses
+    java <javaoptions> listClasses
 
 This command lists all classes for the specified database, namespace, user and
-password.
+password, except system classes.
 
 See:
 

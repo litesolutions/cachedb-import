@@ -1,6 +1,6 @@
 Syntax:
 
-    java <javaoption> import [arguments]
+    java <javaoptions> import [arguments]
 
 This command imports an XML export into the specified database and namespace,
 with the specified user and password.

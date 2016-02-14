@@ -1,9 +1,9 @@
 Syntax:
 
-    java <javaoption> export [arguments]
+    java <javaoptions> export [arguments]
 
-This command exports all classes for the specified database, namespace, user and
-password in a directory as source files. The files will be written in UTF-8.
+This command exports all classes (except system classes) of a given namespace.
+The files will be written in UTF-8.
 
 See:
 

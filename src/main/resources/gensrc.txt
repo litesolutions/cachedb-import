@@ -1,6 +1,6 @@
 Syntax:
 
-    java <javaoption> gensrc [arguments]
+    java <javaoptions> gensrc [arguments]
 
 This command first imports all classes from an XML export into a Caché instance,
 then exports them as sources in a given directory. It can be viewed as a
