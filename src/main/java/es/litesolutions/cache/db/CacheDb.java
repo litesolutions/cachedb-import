@@ -1,5 +1,6 @@
 package es.litesolutions.cache.db;
 
+import com.intersys.cache.Dataholder;
 import com.intersys.classes.Dictionary.ClassDefinition;
 import com.intersys.objects.CacheDatabase;
 import com.intersys.objects.CacheException;
@@ -18,6 +19,10 @@ import com.intersys.objects.Database;
 public final class CacheDb
     implements AutoCloseable
 {
+    private static final String CLASSNAME = "%Library.MessageDictionary";
+    private static final String METHODNAME = "SetSessionLanguage";
+    private static final String LANG = "en-us";
+
     private final Database database;
 
     public CacheDb(final String jdbcUrl, final String user,
@@ -25,6 +30,13 @@ public final class CacheDb
         throws CacheException
     {
         database = CacheDatabase.getDatabase(jdbcUrl, user, password);
+
+        /*
+         * Set the session language to English
+         */
+        final Dataholder[] holders = { Dataholder.create(LANG) };
+        database.runClassMethod(CLASSNAME, METHODNAME, holders,
+            Database.RET_NONE);
     }
 
     /**
