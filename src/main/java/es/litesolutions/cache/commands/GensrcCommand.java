@@ -8,6 +8,12 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Gensrc command: import into the database, then read back as source
+ *
+ * <p>In fact, this command makes use of both an {@link ImportCommand} and an
+ * {@link ExportCommand}.</p>
+ */
 public final class GensrcCommand
     extends CachedbCommand
 {

@@ -25,6 +25,14 @@ public final class CacheDb
 
     private final Database database;
 
+    /**
+     * Constructor
+     *
+     * @param jdbcUrl the JDBC URL (jdbc://Cache/etcetc)
+     * @param user the user
+     * @param password the password
+     * @throws CacheException failure to open the database
+     */
     public CacheDb(final String jdbcUrl, final String user,
         final String password)
         throws CacheException

@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * The entry point
+ */
 public final class CachedbImport
 {
     private static final String HOST = "host";

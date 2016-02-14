@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+/**
+ * Export command: write the source of all classes to a given directory
+ */
 public final class ExportCommand
     extends CachedbCommand
 {

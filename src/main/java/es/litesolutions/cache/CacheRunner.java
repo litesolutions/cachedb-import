@@ -62,6 +62,16 @@ public final class CacheRunner
         this.cacheDb = cacheDb;
     }
 
+    /**
+     * List the classes for this database
+     *
+     * <p>"System" classes, that is classes whose package starts with a {@code
+     * %}, are filtered out.</p>
+     *
+     * @return the set of classes
+     * @throws CacheException Caché error
+     * @throws SQLException SQL error
+     */
     @SuppressWarnings("OverlyBroadThrowsClause")
     public Set<String> listClasses()
         throws CacheException, SQLException
@@ -86,6 +96,21 @@ public final class CacheRunner
         return Collections.unmodifiableSet(set);
     }
 
+    /**
+     * Import an XML export as a stream
+     *
+     * <p>This is needed in some situations where the file import does not work.
+     * Unfortunately, with this mode, you cannot reliably get a list of loaded
+     * classes. See <a
+     * href="http://stackoverflow.com/a/35371306/1093528">here</a> for more
+     * details.</p>
+     *
+     * <p>Prefer to use {@link #importFile(Path)} instead.</p>
+     *
+     * @param path path to the XML export
+     * @throws CacheException Caché error
+     * @throws IOException Failed to read from the XML export
+     */
     public void importStream(final Path path)
         throws CacheException, IOException
     {
@@ -164,6 +189,22 @@ public final class CacheRunner
 //        System.out.println("loadedlist: " + loadedlist.getValue());
     }
 
+    /**
+     * Import an XML as a file
+     *
+     * <p>In fact, this creates a file using the Caché API on the remote server,
+     * copies the content of the XML to this file and then imports it. Unlike
+     * what happens with {@link #importStream(Path)}, with this method, you
+     * <em>do</em> get the list of loaded items back.</p>
+     *
+     * <p>The returned list will only return classes filtered in the same way as
+     * {@link #listClasses()} does, even if the export contains more data.</p>
+     *
+     * @param path path to the XML to import
+     * @return the list of loaded classes
+     * @throws CacheException Caché error
+     * @throws IOException Failure to read from the XML export
+     */
     public Set<String> importFile(final Path path)
         throws CacheException, IOException
     {
@@ -256,6 +297,17 @@ public final class CacheRunner
         return Collections.unmodifiableSet(set);
     }
 
+    /**
+     * Write the source code of a Caché class to a file
+     *
+     * <p>The file is written using UTF-8 and {@code \r\n} as a line terminator.
+     * </p>
+     *
+     * @param className the class name
+     * @param path path of the file to write
+     * @throws CacheException Caché error
+     * @throws IOException Write failure
+     */
     public void writeClassContent(final String className, final Path path)
         throws CacheException, IOException
     {

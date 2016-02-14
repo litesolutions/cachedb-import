@@ -12,6 +12,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Import command: import an XML into the database
+ */
 public final class ImportCommand
     extends CachedbCommand
 {

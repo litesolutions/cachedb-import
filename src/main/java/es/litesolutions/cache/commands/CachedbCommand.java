@@ -1,17 +1,27 @@
 package es.litesolutions.cache.commands;
 
+import es.litesolutions.cache.CachedbImport;
 import es.litesolutions.cache.db.CacheDb;
 import es.litesolutions.cache.CacheRunner;
 import es.litesolutions.cache.Util;
 
 import java.util.Map;
 
+/**
+ * Abstract class for a command run by {@link CachedbImport}
+ */
 public abstract class CachedbCommand
 {
     protected final CacheDb cacheDb;
     protected final CacheRunner runner;
     protected final Map<String, String> arguments;
 
+    /**
+     * Constructor
+     *
+     * @param cacheDb the database
+     * @param arguments map of arguments
+     */
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     protected CachedbCommand(final CacheDb cacheDb,
         final Map<String, String> arguments)
@@ -21,6 +31,11 @@ public abstract class CachedbCommand
         this.arguments = arguments;
     }
 
+    /**
+     * Execute this command
+     *
+     * @throws Exception refined in each individual command
+     */
     public abstract void execute()
         throws Exception;
 
