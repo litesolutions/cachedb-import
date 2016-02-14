@@ -23,22 +23,32 @@ public final class ExportCommand
     private static final String OVERWRITE = "overwrite";
     private static final String OVERWRITE_DEFAULT = "false";
 
+    private final Path outputDir;
+    private final boolean overwrite;
+
     public ExportCommand(final CacheDb cacheDb,
         final Map<String, String> arguments)
     {
         super(cacheDb, arguments);
+        outputDir = Paths.get(getArgument(OUTPUTDIR)).toAbsolutePath();
+        overwrite = Boolean.parseBoolean(getArgumentOrDefault(OVERWRITE,
+            OVERWRITE_DEFAULT));
     }
 
     @Override
     public void execute()
         throws CacheException, SQLException, IOException
     {
-        final String dir = getArgument(OUTPUTDIR);
-        final Path outputDir = Paths.get(dir).toAbsolutePath();
+        prepareDirectory();
 
-        final String s = getArgumentOrDefault(OVERWRITE, OVERWRITE_DEFAULT);
-        final boolean overwrite = Boolean.parseBoolean(s);
+        final Set<String> classes = runner.listClasses();
 
+        writeClasses(classes);
+    }
+
+    void prepareDirectory()
+        throws IOException
+    {
         if (Files.exists(outputDir)) {
             if (!overwrite) {
                 System.err.printf("directory %s already exists", outputDir);
@@ -48,20 +58,21 @@ public final class ExportCommand
         }
 
         Files.createDirectories(outputDir);
+    }
 
-        final Set<String> classes = runner.listClasses();
-
+    void writeClasses(final Set<String> classes)
+        throws CacheException, IOException
+    {
         Path out;
 
         for (final String className: classes) {
-            out = computePath(outputDir, className);
+            out = computePath(className);
             Files.createDirectories(out.getParent());
             runner.writeClassContent(className, out);
         }
     }
 
-    private static Path computePath(final Path outputDir,
-        final String className)
+    private Path computePath(final String className)
     {
         final String[] parts = DOT.split(className);
         final int len = parts.length;

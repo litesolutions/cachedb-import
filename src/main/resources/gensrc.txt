@@ -1,0 +1,43 @@
+Syntax:
+
+    java <javaoption> gensrc [arguments]
+
+This command first imports all classes from an XML export into a Caché instance,
+then exports them as sources in a given directory. It can be viewed as a
+combination of both the import and export command.
+
+See:
+
+    java <javaoptions> help
+
+for a list of global arguments.
+
+Arguments:
+
+    * inputFile=the.xml [MANDATORY]
+
+        Path to the XML file to be imported.
+
+    * mode=[file|stream] [OPTIONAL]
+
+        Tells which mode to use to import. The default is file. If file does
+        not work for you, try stream.
+
+        Note: if stream is chosen, the list of exported classes is a heuristic.
+        First, the list of classes is collected before import, then computed
+        again after import. This is due to the fact that the stream mode is
+        unable to return a list of imported classes, unlike the file mode.
+
+    * outputDir=someDir [MANDATORY]
+
+        Tells where the output files should be written. The directory must not
+        exist, except if the overwrite option is true.
+
+    * overwrite=<true|false> [OPTIONAL]
+
+        Tells what should happen if the directory already exists. The default is
+        false.
+
+        If true, the directory will be deleted recursively before being created
+        again.
+
