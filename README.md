@@ -61,7 +61,7 @@ export file named `/tmp/myexport.xml` and want to generate the sources in
 directory `/tmp/sources`, you will use this command line:
 
 ```
-java -jar build/libs/cachedb-import.jar cfg=/tmp/db.properties
+java -jar build/libs/cachedb-import.jar gensrc cfg=/tmp/db.properties
     inputFile=/tmp/myexport.xml outputDir=/tmp/sources
 ```
 
