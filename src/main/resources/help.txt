@@ -6,7 +6,7 @@ Syntax:
 
 The command argument is mandatory.
 
-Available commands are: listClasses, export.
+Available commands are: listClasses, export, import.
 
 Arguments common to all commands:
 

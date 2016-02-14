@@ -1,0 +1,25 @@
+Syntax:
+
+    java <javaoption> import [arguments]
+
+This command imports an XML export into the specified database and namespace,
+with the specified user and password.
+
+The XML file is expected to be encoded in UTF-8.
+
+See:
+
+    java <javaoptions> help
+
+for a list of global arguments.
+
+Arguments:
+
+    * inputFile=the.xml [MANDATORY]
+
+        Path to the XML file to be imported.
+
+    * mode=[file|stream] [OPTIONAL]
+
+        Tells which mode to use to import. The default is file. If file does
+        not work for you, try stream.

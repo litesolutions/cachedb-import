@@ -2,6 +2,7 @@ package es.litesolutions.cache;
 
 import es.litesolutions.cache.commands.CachedbCommand;
 import es.litesolutions.cache.commands.ExportCommand;
+import es.litesolutions.cache.commands.ImportCommand;
 import es.litesolutions.cache.commands.ListClassesCommand;
 import es.litesolutions.cache.db.CacheDb;
 
@@ -36,6 +37,7 @@ public final class CachedbImport
 
         map.put("listClasses", ListClassesCommand::new);
         map.put("export", ExportCommand::new);
+        map.put("import", ImportCommand::new);
 
         COMMANDS = Collections.unmodifiableMap(map);
     }
