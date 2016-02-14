@@ -3,7 +3,7 @@ package es.litesolutions.cache;
 import com.intersys.cache.Dataholder;
 import com.intersys.classes.CharacterStream;
 import com.intersys.classes.Dictionary.ClassDefinition;
-import com.intersys.classes.FileCharacterStream;
+import com.intersys.classes.FileBinaryStream;
 import com.intersys.classes.GlobalCharacterStream;
 import com.intersys.objects.CacheException;
 import com.intersys.objects.Database;
@@ -171,10 +171,10 @@ public final class CacheRunner
 
         final Database db = cacheDb.getDatabase();
 
-        final FileCharacterStream stream = new FileCharacterStream(db);
+        final FileBinaryStream stream = new FileBinaryStream(db);
         stream._filenameSet(tempFileName);
 
-        loadContent(stream, path);
+        Files.copy(path, stream.getOutputStream());
 
         final String remoteFileName = stream._filenameGet();
 
@@ -219,8 +219,8 @@ public final class CacheRunner
         arguments[5] = Dataholder.create(null);
         // arg 7: displayname. For logging...
         arguments[6] = Dataholder.create(null);
-        // arg 8: charset. Default is empty string, we'll assume UTF-8.
-        arguments[7] = new Dataholder((String) null);
+        // arg 8: charset. We force UTF-8.
+        arguments[7] = new Dataholder("UTF8");
         // arg 9: description (?)
         arguments[8] = Dataholder.create(description.value);
 
