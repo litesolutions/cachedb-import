@@ -47,6 +47,9 @@ public final class CacheRunner
     private static final String WRITECLASSCONTENT_METHODNAME
         = "GetTextAsString";
 
+    private static final String FILE_CLASSNAME = "%File";
+    private static final String FILE_METHODNAME = "TempFileName";
+
     private final CacheDb cacheDb;
 
     public CacheRunner(final CacheDb cacheDb)
@@ -279,9 +282,9 @@ public final class CacheRunner
     private String createRemoteTemporaryFileName()
         throws CacheException
     {
-        final Dataholder[] args = {new Dataholder("xml")};
+        final Dataholder[] args = { new Dataholder("xml") };
         final Dataholder res = cacheDb.getDatabase()
-            .runClassMethod("%File", "TempFilename", args, 0);
+            .runClassMethod(FILE_CLASSNAME, FILE_METHODNAME, args, 0);
         return res.getString();
     }
 
