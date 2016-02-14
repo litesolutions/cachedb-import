@@ -27,9 +27,6 @@ public final class CachedbImport
 
     private static final String NAMESPACE = "namespace";
 
-    private static final String CFG = "cfg";
-    private static final String CFG_DEFAULT = "cachedb.properties";
-
     private static final String JDBC_URL_TEMPLATE = "jdbc:Cache://%s:%s/%s";
 
     private static final Map<String, CommandCreator> COMMANDS;
