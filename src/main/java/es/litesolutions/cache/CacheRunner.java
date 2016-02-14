@@ -251,7 +251,7 @@ public final class CacheRunner
 
         final String value = (String) loadedlist.getValue();
         final Set<String> set = COMMA.splitAsStream(value)
-            .filter(s -> s.endsWith(DOTCLS))
+            .filter(s -> s.charAt(0) != '%' && s.endsWith(DOTCLS))
             .collect(Collectors.toCollection(HashSet::new));
         return Collections.unmodifiableSet(set);
     }
