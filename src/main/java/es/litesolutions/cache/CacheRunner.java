@@ -122,7 +122,7 @@ public final class CacheRunner
         // arg 1: stream
         arguments[0] = Dataholder.create(stream);
         // arg 2: qspec; we want to ensure that compile works, at least
-        arguments[1] = new Dataholder("c");
+        arguments[1] = new Dataholder("d");
         // arg 3: errorlog
         arguments[2] = Dataholder.create(errorlog.value);
         // arg 4: loadedlist
