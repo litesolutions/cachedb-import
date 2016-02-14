@@ -1,6 +1,6 @@
 package es.litesolutions.cache;
 
-import es.litesolutions.cache.commands.CachedbImportCommand;
+import es.litesolutions.cache.commands.CachedbCommand;
 import es.litesolutions.cache.commands.ExportCommand;
 import es.litesolutions.cache.commands.ListClassesCommand;
 import es.litesolutions.cache.util.Argument;
@@ -176,6 +176,6 @@ public final class CachedbImport
     @FunctionalInterface
     private interface CommandCreator
     {
-        CachedbImportCommand create(CacheDb cacheDb, Map<String, String> cfg);
+        CachedbCommand create(CacheDb cacheDb, Map<String, String> cfg);
     }
 }

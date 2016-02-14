@@ -6,14 +6,14 @@ import es.litesolutions.cache.util.Argument;
 
 import java.util.Map;
 
-public abstract class CachedbImportCommand
+public abstract class CachedbCommand
 {
     protected final CacheDb cacheDb;
     protected final CacheRunner runner;
     protected final Map<String, String> arguments;
 
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
-    protected CachedbImportCommand(final CacheDb cacheDb,
+    protected CachedbCommand(final CacheDb cacheDb,
         final Map<String, String> arguments)
     {
         this.cacheDb = cacheDb;

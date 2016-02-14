@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 public final class ListClassesCommand
-    extends CachedbImportCommand
+    extends CachedbCommand
 {
     public ListClassesCommand(final CacheDb db,
         final Map<String, String> arguments)

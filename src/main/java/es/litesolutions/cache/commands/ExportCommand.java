@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public final class ExportCommand
-    extends CachedbImportCommand
+    extends CachedbCommand
 {
     private static final Pattern DOT = Pattern.compile("\\.");
 
