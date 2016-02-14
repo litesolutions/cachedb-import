@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A wrapper class for the necessary methods run by this program
@@ -33,6 +35,9 @@ import java.util.Set;
 public final class CacheRunner
 {
     private static final String CRLF = "\r\n";
+
+    private static final Pattern COMMA = Pattern.compile(",");
+    private static final String DOTCLS = ".cls";
 
     private static final String CLASSDEFINITION_NAME_SQLFIELD = "Name";
 
@@ -159,7 +164,7 @@ public final class CacheRunner
 //        System.out.println("loadedlist: " + loadedlist.getValue());
     }
 
-    public void importFile(final Path path)
+    public Set<String> importFile(final Path path)
         throws CacheException, IOException
     {
         final String tempFileName = createRemoteTemporaryFileName();
@@ -238,11 +243,17 @@ public final class CacheRunner
         /*
          * - others are ByRef arguments
          */
-        errorlog.set(result[1].getString());
-        System.out.println("errorlog: " + errorlog.getValue());
+        // TODO
+//        errorlog.set(result[1].getString());
+//        System.out.println("errorlog: " + errorlog.getValue());
 
         loadedlist.set(result[2].getString());
-        System.out.println("loadedlist: " + loadedlist.getValue());
+
+        final String value = (String) loadedlist.getValue();
+        final Set<String> set = COMMA.splitAsStream(value)
+            .filter(s -> s.endsWith(DOTCLS))
+            .collect(Collectors.toCollection(HashSet::new));
+        return Collections.unmodifiableSet(set);
     }
 
     public void writeClassContent(final String className, final Path path)
