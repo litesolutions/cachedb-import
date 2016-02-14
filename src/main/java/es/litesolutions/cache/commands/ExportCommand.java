@@ -2,7 +2,7 @@ package es.litesolutions.cache.commands;
 
 import com.intersys.objects.CacheException;
 import es.litesolutions.cache.CacheDb;
-import es.litesolutions.cache.util.RmDashRf;
+import es.litesolutions.cache.Util;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,33 +19,32 @@ public final class ExportCommand
     private static final Pattern DOT = Pattern.compile("\\.");
 
     private static final String OUTPUTDIR = "outputDir";
-    private static final String OVERWRITE = "overwrite";
 
-    private final Path outputDir;
-    private final boolean overwrite;
+    private static final String OVERWRITE = "overwrite";
+    private static final String OVERWRITE_DEFAULT = "false";
 
     public ExportCommand(final CacheDb cacheDb,
         final Map<String, String> arguments)
     {
         super(cacheDb, arguments);
-
-        final String dir = getArgument(OUTPUTDIR);
-        outputDir = Paths.get(dir).toAbsolutePath();
-
-        final String s = getArgumentOrDefault(OVERWRITE, "false");
-        overwrite = Boolean.parseBoolean(s);
     }
 
     @Override
     public void execute()
         throws CacheException, SQLException, IOException
     {
+        final String dir = getArgument(OUTPUTDIR);
+        final Path outputDir = Paths.get(dir).toAbsolutePath();
+
+        final String s = getArgumentOrDefault(OVERWRITE, OVERWRITE_DEFAULT);
+        final boolean overwrite = Boolean.parseBoolean(s);
+
         if (Files.exists(outputDir)) {
             if (!overwrite) {
                 System.err.printf("directory %s already exists", outputDir);
                 System.exit(2);
             }
-            RmDashRf.rmDashRf(outputDir);
+            Util.deleteDirectory(outputDir);
         }
 
         Files.createDirectories(outputDir);

@@ -5,15 +5,7 @@ import es.litesolutions.cache.commands.ExportCommand;
 import es.litesolutions.cache.commands.ListClassesCommand;
 import es.litesolutions.cache.util.Argument;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -60,7 +52,7 @@ public final class CachedbImport
         throws Exception
     {
         if (args.length < 1) {
-            readHelp();
+            Util.readHelp();
             System.exit(2);
         }
 
@@ -68,18 +60,18 @@ public final class CachedbImport
         final CommandCreator creator = COMMANDS.get(cmdName);
 
         if ("help".equals(cmdName)) {
-            readHelp();
+            Util.readHelp();
             System.exit(2);
         }
 
         if (creator == null) {
             System.err.printf("Unknown command '%s'%n", cmdName);
-            readHelp();
+            Util.readHelp();
             System.exit(2);
         }
 
         if (args.length >= 2 && "help".equals(args[1])) {
-            readHelp(cmdName);
+            Util.readHelp(cmdName);
             System.exit(2);
         }
 
@@ -140,37 +132,6 @@ public final class CachedbImport
         }
 
         return ret;
-    }
-
-    private static void readHelp(final String cmdName)
-        throws IOException
-    {
-        final URL url = CachedbImport.class.getResource('/' + cmdName + ".txt");
-
-        if (url == null) {
-            System.err.println("What the... Cannot find help text :(");
-            System.exit(-1);
-        }
-
-        final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
-            .onMalformedInput(CodingErrorAction.REPORT);
-
-        try (
-            final InputStream in = url.openStream();
-            final Reader reader = new InputStreamReader(in, decoder);
-            final BufferedReader br = new BufferedReader(reader);
-        ) {
-            String line;
-
-            while ((line = br.readLine()) != null)
-                System.err.println(line);
-        }
-    }
-
-    private static void readHelp()
-        throws IOException
-    {
-        readHelp("help");
     }
 
     @FunctionalInterface
