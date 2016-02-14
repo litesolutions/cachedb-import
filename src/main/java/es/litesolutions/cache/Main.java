@@ -1,6 +1,7 @@
 package es.litesolutions.cache;
 
 import com.intersys.objects.CacheException;
+import es.litesolutions.cache.db.CacheDb;
 
 import java.io.IOException;
 import java.io.Reader;

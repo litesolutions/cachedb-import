@@ -1,4 +1,4 @@
-package es.litesolutions.cache.util;
+package es.litesolutions.cache.db;
 
 import com.intersys.objects.CacheException;
 import com.intersys.objects.CacheQuery;

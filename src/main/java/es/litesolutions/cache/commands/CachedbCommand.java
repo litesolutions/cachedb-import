@@ -1,6 +1,6 @@
 package es.litesolutions.cache.commands;
 
-import es.litesolutions.cache.CacheDb;
+import es.litesolutions.cache.db.CacheDb;
 import es.litesolutions.cache.CacheRunner;
 import es.litesolutions.cache.Util;
 

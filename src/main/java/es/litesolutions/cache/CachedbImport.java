@@ -3,6 +3,7 @@ package es.litesolutions.cache;
 import es.litesolutions.cache.commands.CachedbCommand;
 import es.litesolutions.cache.commands.ExportCommand;
 import es.litesolutions.cache.commands.ListClassesCommand;
+import es.litesolutions.cache.db.CacheDb;
 
 import java.io.Reader;
 import java.nio.file.Files;

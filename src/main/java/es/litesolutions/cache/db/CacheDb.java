@@ -1,11 +1,10 @@
-package es.litesolutions.cache;
+package es.litesolutions.cache.db;
 
 import com.intersys.classes.Dictionary.ClassDefinition;
 import com.intersys.objects.CacheDatabase;
 import com.intersys.objects.CacheException;
 import com.intersys.objects.CacheQuery;
 import com.intersys.objects.Database;
-import es.litesolutions.cache.util.CacheQueryProvider;
 
 /**
  * Wrapper over a Caché {@link Database}

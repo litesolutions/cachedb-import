@@ -8,7 +8,9 @@ import com.intersys.classes.GlobalCharacterStream;
 import com.intersys.objects.CacheException;
 import com.intersys.objects.Database;
 import com.intersys.objects.StringHolder;
-import es.litesolutions.cache.util.CacheQueryProvider;
+import es.litesolutions.cache.db.CacheDb;
+import es.litesolutions.cache.db.CacheQueryProvider;
+import es.litesolutions.cache.db.CacheSqlQuery;
 
 import java.io.IOException;
 import java.io.Reader;
