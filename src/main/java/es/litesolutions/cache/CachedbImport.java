@@ -3,7 +3,6 @@ package es.litesolutions.cache;
 import es.litesolutions.cache.commands.CachedbCommand;
 import es.litesolutions.cache.commands.ExportCommand;
 import es.litesolutions.cache.commands.ListClassesCommand;
-import es.litesolutions.cache.util.Argument;
 
 import java.io.Reader;
 import java.nio.file.Files;
@@ -91,9 +90,9 @@ public final class CachedbImport
         /*
          * Basic arguments required to generate the JDBC URL
          */
-        final String host = Argument.readOrDefault(HOST, cfg, HOST_DEFAULT);
-        final String port = Argument.readOrDefault(PORT, cfg, PORT_DEFAULT);
-        final String namespace = Argument.read(NAMESPACE, cfg);
+        final String host = Util.readOrDefault(HOST, cfg, HOST_DEFAULT);
+        final String port = Util.readOrDefault(PORT, cfg, PORT_DEFAULT);
+        final String namespace = Util.readArgument(NAMESPACE, cfg);
 
         final String jdbcUrl = String.format(JDBC_URL_TEMPLATE, host, port,
             namespace);
@@ -101,8 +100,8 @@ public final class CachedbImport
         /*
          * Now the user and password
          */
-        final String user = Argument.read(USER, cfg);
-        final String password = Argument.read(PASSWORD, cfg);
+        final String user = Util.readArgument(USER, cfg);
+        final String password = Util.readArgument(PASSWORD, cfg);
 
         try (
             final CacheDb db = new CacheDb(jdbcUrl, user, password);

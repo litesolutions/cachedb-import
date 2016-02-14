@@ -2,7 +2,7 @@ package es.litesolutions.cache.commands;
 
 import es.litesolutions.cache.CacheDb;
 import es.litesolutions.cache.CacheRunner;
-import es.litesolutions.cache.util.Argument;
+import es.litesolutions.cache.Util;
 
 import java.util.Map;
 
@@ -26,12 +26,12 @@ public abstract class CachedbCommand
 
     protected final String getArgument(final String name)
     {
-        return Argument.read(name, arguments);
+        return Util.readArgument(name, arguments);
     }
 
     protected final String getArgumentOrDefault(final String name,
         final String defaultValue)
     {
-        return Argument.readOrDefault(name, arguments, defaultValue);
+        return Util.readOrDefault(name, arguments, defaultValue);
     }
 }
