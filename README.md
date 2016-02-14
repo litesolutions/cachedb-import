@@ -1,8 +1,12 @@
 ## What this is
 
-The goal of this program is to take an XML export of a Caché project (as
-exported by Studio, for instance) and generate a directory with plain source
-files.
+This is a command line program which allows to perform the following:
+
+* list classes from a given namespace;
+* import an XML file into a namespace;
+* export classes in a namespace as source files;
+* combine both import and export: take an XML export, import it and generate the
+  source files.
 
 This program **needs not** run on the same machine as the Caché installation.
 
@@ -63,43 +67,28 @@ java -jar build/libs/cachedb-import.jar cfg=/tmp/db.properties
 
 Please see the help for more options.
 
-## How this works
+## Limitations
 
-### Listing the classes
+### Stream import (`mode=stream`) has limits
 
-This is done using the summary query of `%Library.ClassDefinition`.
+Unfortunately, the stream import routine provided by Caché is unable to provide
+the list of classes which were imported. As a result, when you try and generate
+the sources from an XML import, what happens is the following:
 
-**Note that this means that only classes (ie, .cls) files are accounted for!**
-Include files and MAC files are not, nor are project files.
+* the list of classes in the namespace is listed before import;
+* the XML is imported;
+* the list of classes after import is listed;
+* the difference between those two lists is then exported.
 
-### Import as a stream
+### Imported items are not removed, even if only generating sources
 
-In this case, the streaming load method of `$SYSTEM.OBJ` is used. Unfortunately,
-in this case, the list of loaded objects is... Nothing.
+One such reason is because of the stream import limitation mentioned above. If
+you want to delete the imported items, you have to do it by hand.
 
-Which means that in order to list the classes actually loaded by the imported
-XML, an alternate solution needs to be found. The current plan is as follows:
+### Only .cls (class definitions) are exported to sources
 
-* list the classes before import;
-* import as a stream;
-* list the classes after import;
-* compute the difference: those are the loaded classes.
-
-### Import using a remote file
-
-In this case, a remote file is created on the server; the contents of the
-imported file are copied into it, and the file load method of `$SYSTEM.OBJ` is
-called.
-
-And with this method, you do get the list of classes which were imported, unlike
-with the streaming load method.
-
-### Exporting to source files
-
-The `%Compiler.UDL.TextServices` class is used in this case.
-
-This class allows the source to be written in exactly the same manner as you
-would see them in Studio.
+However, the import routine _will_ import everything in the XML (globals,
+routines, INC files, etc).
 
 ## Problems
 
