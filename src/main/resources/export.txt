@@ -1,0 +1,28 @@
+Syntax:
+
+    java <javaoption> export [arguments]
+
+This command exports all classes for the specified database, namespace, user and
+password in a directory as source files. The files will be written in UTF-8.
+
+See:
+
+    java <javaoptions> help
+
+for a list of global arguments.
+
+Arguments:
+
+    * outputDir=someDir [MANDATORY]
+
+        Tells where the output files should be written. The directory must not
+        exist, except if the overwrite option is true.
+
+    * overwrite=<true|false> [OPTIONAL]
+
+        Tells what should happen if the directory already exists. The default is
+        false.
+
+        If true, the directory will be deleted recursively before being created
+        again.
+

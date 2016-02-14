@@ -1,27 +1,19 @@
-Syntax: java ... <command> [cfg=somefile] [arg=value ...]
+Syntax:
 
-The command argument is mandatory; available commands, and their arguments, are
-specified below.
+    java <javaoptions> <command> [arguments]
+    java <javaoptions> help
+    java <javaoptions> <command> help
 
-If a configuration file is specified, using cfg=..., then arguments are read
-from this file. The configuration file is expected to be a Java properties file,
-ENCODED IN UTF-8 (this is the 21st century, after all).
+The command argument is mandatory.
 
-The rule is that if a property is defined in this file, but also at the command
-line, then the command line takes precedence.
+Available commands are: listClasses, export.
 
-Typically, you want to use this file to define the database connection data. See
-below.
+Arguments common to all commands:
 
-COMMANDS:
+    * cfg=somefile [OPTIONAL]
 
-    * listClasses: list available classes on a given namespace.
-    * export: write the class definitions of a given namespace as plain source
-      files in a directory of your choice.
-
-GLOBAL ARGUMENTS
-
-    The following arguments are defined for all commands.
+        Read arguments from "somefile", which must be a Java properties file
+        in UTF-8. Note that arguments on the command line take precedence.
 
     * verbose=<true|false> [OPTIONAL]
 
@@ -48,51 +40,3 @@ GLOBAL ARGUMENTS
 
         Specify the namespace this user must try and connect to.
 
-        Note that the user/password pair must have full access to this
-        particular namespace, along with execution privileges on the %SYS
-        namespace.
-
-COMMAND: listClasses
-
-    This command will just list all classes in a given
-    database/user/password/namespace.
-
-    The result of the list will be output to the standard output.
-
-    OPTIONS:
-
-        * none.
-
-COMMAND: export
-
-    This command will write, as plain text files, all class contents in a
-    given database/user/password/namespace environment into a directory.
-
-    Subdirectories will be created on demand; that is, a class named A.B.C
-    will be saved as A/B/C.cls in the target directory.
-
-    This command expects an output directory to write the files to, see below.
-    If the directory already exists, an error will be thrown, unless this
-    command has been explicitly instructed to overwrite all contents; again, see
-    below.
-
-    Note that all written files will be written using UTF-8 as a character
-    coding.
-
-    OPTIONS:
-
-        * outputDir=someDir [MANDATORY]
-
-            Tells where the output files should be written. The directory must
-            not be existing, except if the overwrite option is true.
-
-        * overwrite=<true|false> [OPTIONAL]
-
-            Tells what should happen if the directory already exists. FALSE IS
-            THE DEFAULT.
-
-            If false, then if the file exists (even if it's not a directory),
-            the command fails.
-
-            If true, the directory or file will be deleted (recursively so if it
-            actually is a directory) before being created again.

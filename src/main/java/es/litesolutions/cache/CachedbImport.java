@@ -15,7 +15,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,8 +23,6 @@ import java.util.Properties;
 
 public final class CachedbImport
 {
-    private static final String HELP = "/help.txt";
-
     private static final String HOST = "host";
     private static final String HOST_DEFAULT = "localhost";
 
@@ -70,28 +67,37 @@ public final class CachedbImport
         final String cmdName = args[0];
         final CommandCreator creator = COMMANDS.get(cmdName);
 
+        if ("help".equals(cmdName)) {
+            readHelp();
+            System.exit(2);
+        }
+
         if (creator == null) {
             System.err.printf("Unknown command '%s'%n", cmdName);
             readHelp();
             System.exit(2);
         }
 
+        if (args.length >= 2 && "help".equals(args[1])) {
+            readHelp(cmdName);
+            System.exit(2);
+        }
+
         final Map<String, String> cfg = getCfg(args);
 
-        final Path path = getProperties(cfg);
+        final String cfgFile = cfg.get("cfg");
 
-        if (path != null) {
+        if (cfgFile != null) {
             final Properties properties = new Properties();
             try (
-                final Reader reader = Files.newBufferedReader(path);
+                final Reader reader = Files.newBufferedReader(
+                    Paths.get(cfgFile));
             ) {
                 properties.load(reader);
                 for (final String key: properties.stringPropertyNames())
                     cfg.putIfAbsent(key, properties.getProperty(key));
             }
-        } else
-            System.err.printf("No properties file found; relying on command"
-                + " line arguments");
+        }
 
         /*
          * Basic arguments required to generate the JDBC URL
@@ -136,19 +142,10 @@ public final class CachedbImport
         return ret;
     }
 
-    private static Path getProperties(final Map<String, String> cfg)
-    {
-        final String candidate = cfg.getOrDefault(CFG, CFG_DEFAULT);
-
-        final Path ret = Paths.get(candidate);
-
-        return Files.isRegularFile(ret) ? ret : null;
-    }
-
-    private static void readHelp()
+    private static void readHelp(final String cmdName)
         throws IOException
     {
-        final URL url = CachedbImport.class.getResource(HELP);
+        final URL url = CachedbImport.class.getResource('/' + cmdName + ".txt");
 
         if (url == null) {
             System.err.println("What the... Cannot find help text :(");
@@ -168,6 +165,12 @@ public final class CachedbImport
             while ((line = br.readLine()) != null)
                 System.err.println(line);
         }
+    }
+
+    private static void readHelp()
+        throws IOException
+    {
+        readHelp("help");
     }
 
     @FunctionalInterface

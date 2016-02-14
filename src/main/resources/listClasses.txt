@@ -1,0 +1,16 @@
+Syntax:
+
+    java <javaoption> listClasses
+
+This command lists all classes for the specified database, namespace, user and
+password.
+
+See:
+
+    java <javaoptions> help
+
+for a list of global arguments.
+
+Arguments:
+
+    NONE
