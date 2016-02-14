@@ -10,54 +10,58 @@ This program **needs not** run on the same machine as the Caché installation.
 
 ## Status
 
-Work in progress...
+The jar basically works; however, because InterSystems jars are not 
+redistributable (that I know of, at least) and this program needs it, you have
+to build it yourself; see the instructions below.
 
-What is done right now is:
-
-* list the available classes in a namespace (this is done using [the Java
-  binding for this
-class](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25Dictionary.ClassDefinitionQuery));
-* import an XML file as a stream (this is done using [this
-  method](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25SYSTEM.OBJ#METHOD_LoadStream))
-  or using a remote created file (using [this method](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25SYSTEM.OBJ#METHOD_Load));
-* write a class to a plain file (this is done using [this
-  method](http://docs.intersystems.com/cache20152/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25Compiler.UDL.TextServices#METHOD_GetTextAsString)).
-
-Read the "Problems" section below... There are unfortunately quite a few if the
-Caché installation is under Windows.
-
-## How to hack on it
+## How to use
 
 * Clone this project.
 * Have a JDK 8 install.
 * Copy `cachedb.jar` and `cachejdbc.jar` from a Caché installation into the
   `lib` directory of the cloned project.
-* Open this project with your favorite IDE (which must support
-  [gradle](http://www.gradle.org)).
-* On the Caché side:
-    * create an empty namespace;
-    * create a user (or reuse an existing one) for that namespace; note that
-      this user must have execution privileges on the `%SYS` namespace.
+* Build the jar with `./gradlew shadowJar`.
 
-Once the above is done, create a properties files with the following keys:
+## Running
+
+The generated jar is fully contained, and generated as 
+`build/libs/cachedb-import.jar`.
+
+You can view a global help with:
+
+```
+java -jar build/libs/cachedb-import.jar help
+```
+
+It is recommended that you use a property file with the following keys, so that
+the command line is not too long, and reuse it across your commands:
 
 
 ```
 # Host where the Caché installation is.
 # If not specified, the default is localhost.
-cachedb.host = some.host.somewhere
+host = some.host.somewhere
 # Port to connect to.
 # If not specified, the default is 1972.
-cachedb.port = 1972
+port = 1972
 # REQUIRED: Caché user
-cachedb.user = theuser
+user = theuser
 # REQUIRED: the password
-cachedb.password = thepassword
+password = thepassword
 # REQUIRED: the namespace
-cachedb.namespace = THENAMESPACE
-# REQUIRED if importing: the file to load
-loadedFile = /path/to/some/file
+namespace = THENAMESPACE
 ```
+
+Say this file is named `/tmp/db.properties`; if you have, for instance, an XML
+export file named `/tmp/myexport.xml` and want to generate the sources in
+directory `/tmp/sources`, you will use this command line:
+
+```
+java -jar build/libs/cachedb-import.jar cfg=/tmp/db.properties
+    inputFile=/tmp/myexport.xml outputDir=/tmp/sources
+```
+
+Please see the help for more options.
 
 ## How this works
 
