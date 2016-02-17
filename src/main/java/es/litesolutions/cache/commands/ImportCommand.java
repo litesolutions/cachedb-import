@@ -76,15 +76,15 @@ public final class ImportCommand
     private Set<String> importFile()
         throws CacheException, IOException
     {
-        return runner.importFile(inputFile);
+        return runner.importFile(inputFile, includeSys);
     }
 
     private Set<String> importStreamAndList()
         throws CacheException, SQLException, IOException
     {
-        final Set<String> before = runner.listClasses();
+        final Set<String> before = runner.listClasses(includeSys);
         importStream();
-        final Set<String> after = new HashSet<>(runner.listClasses());
+        final Set<String> after = new HashSet<>(runner.listClasses(includeSys));
         after.removeAll(before);
         return Collections.unmodifiableSet(after);
     }

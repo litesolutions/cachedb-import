@@ -44,7 +44,7 @@ public final class ExportCommand
     {
         prepareDirectory();
 
-        final Set<String> classes = runner.listClasses();
+        final Set<String> classes = runner.listClasses(includeSys);
 
         writeClasses(classes);
     }

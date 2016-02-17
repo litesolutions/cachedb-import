@@ -12,9 +12,14 @@ import java.util.Map;
  */
 public abstract class CachedbCommand
 {
+    protected static final String INCLUDESYS = "includeSys";
+    protected static final String INCLUDESYS_DEFAULT = "false";
+
     protected final CacheDb cacheDb;
     protected final CacheRunner runner;
     protected final Map<String, String> arguments;
+
+    protected final boolean includeSys;
 
     /**
      * Constructor
@@ -29,6 +34,9 @@ public abstract class CachedbCommand
         this.cacheDb = cacheDb;
         runner = new CacheRunner(cacheDb);
         this.arguments = arguments;
+
+        includeSys = Boolean.parseBoolean(Util.readOrDefault(INCLUDESYS,
+            arguments, INCLUDESYS_DEFAULT));
     }
 
     /**

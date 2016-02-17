@@ -40,3 +40,9 @@ Arguments common to all commands:
 
         Specify the namespace this user must try and connect to.
 
+    * includeSys=[true|false] [OPTIONAL]
+
+        Also import/list/export "sysem" classes; that is, classes whose name
+        starts with a % sign.
+
+        The default is false.

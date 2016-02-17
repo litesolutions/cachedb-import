@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,9 @@ import java.util.stream.Collectors;
 public final class CacheRunner
 {
     private static final String CRLF = "\r\n";
+
+    private static final Predicate<String> CLSFILES = s -> s.endsWith(".cls");
+    private static final Predicate<String> SYSEXCLUDE = s -> s.charAt(0) == '%';
 
     private static final Pattern COMMA = Pattern.compile(",");
     private static final String DOTCLS = ".cls";
@@ -65,15 +69,13 @@ public final class CacheRunner
     /**
      * List the classes for this database
      *
-     * <p>"System" classes, that is classes whose package starts with a {@code
-     * %}, are filtered out.</p>
-     *
+     * @param includeSys also list system classes
      * @return the set of classes
      * @throws CacheException Caché error
      * @throws SQLException SQL error
      */
     @SuppressWarnings("OverlyBroadThrowsClause")
-    public Set<String> listClasses()
+    public Set<String> listClasses(final boolean includeSys)
         throws CacheException, SQLException
     {
         final Set<String> set = new HashSet<>();
@@ -88,7 +90,7 @@ public final class CacheRunner
                 /*
                  * FIXME: meh, that would be better done at the query level
                  */
-                if (name.charAt(0) != '%')
+                if (includeSys || name.charAt(0) != '%')
                     set.add(name);
             }
         }
@@ -105,7 +107,7 @@ public final class CacheRunner
      * href="http://stackoverflow.com/a/35371306/1093528">here</a> for more
      * details.</p>
      *
-     * <p>Prefer to use {@link #importFile(Path)} instead.</p>
+     * <p>Prefer to use {@link #importFile(Path, boolean)} instead.</p>
      *
      * @param path path to the XML export
      * @throws CacheException Caché error
@@ -197,15 +199,13 @@ public final class CacheRunner
      * what happens with {@link #importStream(Path)}, with this method, you
      * <em>do</em> get the list of loaded items back.</p>
      *
-     * <p>The returned list will only return classes filtered in the same way as
-     * {@link #listClasses()} does, even if the export contains more data.</p>
-     *
      * @param path path to the XML to import
+     * @param includeSys include system classes
      * @return the list of loaded classes
      * @throws CacheException Caché error
      * @throws IOException Failure to read from the XML export
      */
-    public Set<String> importFile(final Path path)
+    public Set<String> importFile(final Path path, final boolean includeSys)
         throws CacheException, IOException
     {
         final String tempFileName = createRemoteTemporaryFileName();
@@ -290,9 +290,13 @@ public final class CacheRunner
 
         loadedlist.set(result[2].getString());
 
+        Predicate<String> predicate = CLSFILES;
+        if (!includeSys)
+            predicate = predicate.and(SYSEXCLUDE);
+
         final String value = (String) loadedlist.getValue();
         final Set<String> set = COMMA.splitAsStream(value)
-            .filter(s -> s.charAt(0) != '%' && s.endsWith(DOTCLS))
+            .filter(predicate)
             .collect(Collectors.toCollection(HashSet::new));
         return Collections.unmodifiableSet(set);
     }
