@@ -297,6 +297,7 @@ public final class CacheRunner
         final String value = (String) loadedlist.getValue();
         final Set<String> set = COMMA.splitAsStream(value)
             .filter(predicate)
+            .map(s -> s.substring(0, s.length() - 4))
             .collect(Collectors.toCollection(HashSet::new));
         return Collections.unmodifiableSet(set);
     }
