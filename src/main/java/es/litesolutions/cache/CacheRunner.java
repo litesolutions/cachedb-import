@@ -41,7 +41,6 @@ public final class CacheRunner
     private static final Predicate<String> SYSEXCLUDE = s -> s.charAt(0) == '%';
 
     private static final Pattern COMMA = Pattern.compile(",");
-    private static final String DOTCLS = ".cls";
 
     private static final String CLASSDEFINITION_NAME_SQLFIELD = "Name";
 
