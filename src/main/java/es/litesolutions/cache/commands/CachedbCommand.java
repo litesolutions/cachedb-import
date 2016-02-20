@@ -1,6 +1,6 @@
 package es.litesolutions.cache.commands;
 
-import es.litesolutions.cache.CachedbImport;
+import es.litesolutions.cache.CacheImport;
 import es.litesolutions.cache.db.CacheDb;
 import es.litesolutions.cache.CacheRunner;
 import es.litesolutions.cache.Util;
@@ -8,7 +8,7 @@ import es.litesolutions.cache.Util;
 import java.util.Map;
 
 /**
- * Abstract class for a command run by {@link CachedbImport}
+ * Abstract class for a command run by {@link CacheImport}
  */
 public abstract class CachedbCommand
 {

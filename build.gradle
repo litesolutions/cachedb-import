@@ -28,7 +28,7 @@ dependencies {
     compile fileTree("lib");
 }
 
-mainClassName = "es.litesolutions.cache.CachedbImport";
+mainClassName = "es.litesolutions.cache.CacheImport";
 
 shadowJar {
     archiveName = "${project.name}.jar";

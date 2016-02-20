@@ -18,7 +18,7 @@ import java.util.Properties;
 /**
  * The entry point
  */
-public final class CachedbImport
+public final class CacheImport
 {
     private static final String HOST = "host";
     private static final String HOST_DEFAULT = "localhost";
@@ -47,7 +47,7 @@ public final class CachedbImport
         COMMANDS = Collections.unmodifiableMap(map);
     }
 
-    private CachedbImport()
+    private CacheImport()
     {
         throw new Error("instantiation not permitted");
     }

@@ -53,7 +53,7 @@ public final class Util
     public static void readHelp(final String cmdName)
         throws IOException
     {
-        final URL url = CachedbImport.class.getResource('/' + cmdName + ".txt");
+        final URL url = CacheImport.class.getResource('/' + cmdName + ".txt");
 
         if (url == null) {
             System.err.println("What the... Cannot find help text :(");
