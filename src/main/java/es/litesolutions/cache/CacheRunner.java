@@ -38,7 +38,7 @@ public final class CacheRunner
     private static final String CRLF = "\r\n";
 
     private static final Predicate<String> CLSFILES = s -> s.endsWith(".cls");
-    private static final Predicate<String> SYSEXCLUDE = s -> s.charAt(0) == '%';
+    private static final Predicate<String> SYSEXCLUDE = s -> s.charAt(0) != '%';
 
     private static final Pattern COMMA = Pattern.compile(",");
 
