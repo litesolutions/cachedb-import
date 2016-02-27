@@ -294,6 +294,11 @@ public final class CacheRunner
             predicate = predicate.and(SYSEXCLUDE);
 
         final String value = (String) loadedlist.getValue();
+        /*
+         * It can happen if we have nothing imported...
+         */
+        if (value == null)
+            return Collections.emptySet();
         final Set<String> set = COMMA.splitAsStream(value)
             .filter(predicate)
             .map(s -> s.substring(0, s.length() - 4))
