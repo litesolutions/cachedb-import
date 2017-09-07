@@ -13,7 +13,7 @@ import java.util.Map;
 public abstract class CachedbCommand
 {
     protected static final String INCLUDESYS = "includeSys";
-    protected static final String INCLUDESYS_DEFAULT = "false";
+    protected static final String INCLUDESYS_DEFAULT = "true";
 
     protected final CacheDb cacheDb;
     protected final CacheRunner runner;

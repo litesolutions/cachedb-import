@@ -100,7 +100,7 @@ public final class CacheImport
          */
         final String host = Util.readOrDefault(HOST, cfg, HOST_DEFAULT);
         final String port = Util.readOrDefault(PORT, cfg, PORT_DEFAULT);
-        final String namespace = Util.readArgument(NAMESPACE, cfg);
+        final String namespace = Util.readOrDefault(NAMESPACE, cfg, "USER");
 
         final String jdbcUrl = String.format(JDBC_URL_TEMPLATE, host, port,
             namespace);
@@ -108,8 +108,8 @@ public final class CacheImport
         /*
          * Now the user and password
          */
-        final String user = Util.readArgument(USER, cfg);
-        final String password = Util.readArgument(PASSWORD, cfg);
+        final String user = Util.readOrDefault(USER, cfg, "");
+        final String password = Util.readOrDefault(PASSWORD, cfg, "");
 
         try (
             final CacheDb db = new CacheDb(jdbcUrl, user, password);

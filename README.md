@@ -85,28 +85,8 @@ the sources from an XML import, what happens is the following:
 One such reason is because of the stream import limitation mentioned above. If
 you want to delete the imported items, you have to do it by hand.
 
-### Only .cls (class definitions) are exported to sources
+### Only .(cls|mac|int|inc) are exported to sources
 
 However, the import routine _will_ import everything in the XML (globals,
-routines, INC files, etc).
-
-## Problems
-
-### Unable to use the file import with some environments
-
-This environment is known to completely fail with file based import, for reasons
-still not understood:
-
-* Windows 8.1, x86_64;
-* Caché 2015.3.
-
-The problems with this environment are, along others:
-
-* if a character stream is used, the result file on the server is corrupted;
-* if a binary stream is used, the result file is not corrupted, but the import
-  fails.
-
-Which means that for this environment in particular, and maybe others, there is
-no choice but to use the streaming import -- at least until the reasons for
-these failures are understood and possibly fixed.
+csp files, etc).
 

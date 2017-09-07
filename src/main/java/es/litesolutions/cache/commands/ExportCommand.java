@@ -75,10 +75,11 @@ public final class ExportCommand
         }
     }
 
-    private Path computePath(final String className)
+    private Path computePath(final String className) throws IOException
     {
         final String[] parts = DOT.split(className);
-        final int len = parts.length;
+        final String ext = parts[parts.length - 1];
+        final int len = parts.length - 1;
         final String lastPart = parts[len - 1];
 
         Path ret = outputDir;
@@ -86,6 +87,6 @@ public final class ExportCommand
         for (int i = 0; i < len - 1; i++)
             ret = ret.resolve(parts[i]);
 
-        return ret.resolve(lastPart + ".cls");
+        return ret.resolve(lastPart + '.' + ext);
     }
 }
