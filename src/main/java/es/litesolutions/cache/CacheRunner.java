@@ -12,9 +12,7 @@ import es.litesolutions.cache.db.CacheDb;
 import es.litesolutions.cache.db.CacheQueryProvider;
 import es.litesolutions.cache.db.CacheSqlQuery;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -37,7 +35,7 @@ public final class CacheRunner
 {
     private static final String CRLF = "\r\n";
 
-    private static final Predicate<String> CLSFILES = s -> s.endsWith(".cls");
+    private static final Predicate<String> FILES = s -> s.toLowerCase().matches(".*\\.(cls|mac|int|inc)$");
     private static final Predicate<String> SYSEXCLUDE = s -> s.charAt(0) != '%';
 
     private static final Pattern COMMA = Pattern.compile(",");
@@ -51,9 +49,9 @@ public final class CacheRunner
     private static final String LOADFILE_METHODNAME = "Load";
 
     private static final String WRITECLASSCONTENT_CLASSNAME
-        = "%Compiler.UDL.TextServices";
+        = "%SYSTEM.OBJ";
     private static final String WRITECLASSCONTENT_METHODNAME
-        = "GetTextAsString";
+        = "ExportUDL";
 
     private static final String FILE_CLASSNAME = "%File";
     private static final String FILE_METHODNAME = "TempFilename";
@@ -207,7 +205,7 @@ public final class CacheRunner
     public Set<String> importFile(final Path path, final boolean includeSys)
         throws CacheException, IOException
     {
-        final String tempFileName = createRemoteTemporaryFileName();
+        final String tempFileName = createRemoteTemporaryFileName("xml");
 
         final Database db = cacheDb.getDatabase();
 
@@ -289,7 +287,7 @@ public final class CacheRunner
 
         loadedlist.set(result[2].getString());
 
-        Predicate<String> predicate = CLSFILES;
+        Predicate<String> predicate = FILES;
         if (!includeSys)
             predicate = predicate.and(SYSEXCLUDE);
 
@@ -301,7 +299,7 @@ public final class CacheRunner
             return Collections.emptySet();
         final Set<String> set = COMMA.splitAsStream(value)
             .filter(predicate)
-            .map(s -> s.substring(0, s.length() - 4))
+//            .map(s -> s.substring(0, s.length() - 4))
             .collect(Collectors.toCollection(HashSet::new));
         return Collections.unmodifiableSet(set);
     }
@@ -322,15 +320,13 @@ public final class CacheRunner
     {
         final Database db = cacheDb.getDatabase();
 
-        final int[] byRefs = new int[1];
-        byRefs[0] = 3;
-        final StringHolder holder = new StringHolder("");
+        final int[] byRefs = new int[0];
 
-        final Dataholder[] arguments = new Dataholder[4];
-        arguments[0] = new Dataholder((String) null);
-        arguments[1] = new Dataholder(className);
-        arguments[2] = Dataholder.create(holder.value);
-        arguments[3] = new Dataholder(CRLF);
+        final String tempFileName = createRemoteTemporaryFileName("txt");
+
+        final Dataholder[] arguments = new Dataholder[2];
+        arguments[0] = new Dataholder(className);
+        arguments[1] = new Dataholder(tempFileName);
 
         final Dataholder[] res = db.runClassMethod(
             WRITECLASSCONTENT_CLASSNAME,
@@ -342,19 +338,18 @@ public final class CacheRunner
 
         db.parseStatus(res[0]);
 
-        holder.set(res[1].getString());
+        final FileBinaryStream stream = new FileBinaryStream(db);
+        stream._filenameSet(tempFileName);
 
-        try (
-            final Writer writer = Files.newBufferedWriter(path);
-        ) {
-            writer.write(holder.value);
-        }
+        Files.copy(stream.getInputStream(), path);
+
+        stream._clear();
     }
 
-    private String createRemoteTemporaryFileName()
+    private String createRemoteTemporaryFileName(String fileExt)
         throws CacheException
     {
-        final Dataholder[] args = { new Dataholder("xml") };
+        final Dataholder[] args = { new Dataholder(fileExt) };
         final Dataholder res = cacheDb.getDatabase()
             .runClassMethod(FILE_CLASSNAME, FILE_METHODNAME, args, 0);
         return res.getString();
