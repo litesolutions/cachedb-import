@@ -18,6 +18,10 @@ The jar basically works; however, because InterSystems jars are not
 redistributable (that I know of, at least) and this program needs it, you have
 to build it yourself; see the instructions below.
 
+## Requisites
+
+* Caché database 2016.2.
+
 ## How to use
 
 * Clone this project.
