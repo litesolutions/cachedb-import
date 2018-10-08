@@ -2,7 +2,6 @@ package es.litesolutions.cache;
 
 import com.intersys.cache.Dataholder;
 import com.intersys.classes.CharacterStream;
-import com.intersys.classes.Dictionary.ClassDefinition;
 import com.intersys.classes.FileBinaryStream;
 import com.intersys.classes.GlobalCharacterStream;
 import com.intersys.objects.CacheException;
@@ -10,18 +9,15 @@ import com.intersys.objects.Database;
 import com.intersys.objects.StringHolder;
 import es.litesolutions.cache.db.CacheDb;
 import es.litesolutions.cache.db.CacheQueryProvider;
-import es.litesolutions.cache.db.CacheSqlQuery;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -31,90 +27,25 @@ import java.util.stream.Collectors;
  * {@link Database}) since the former's {@link CacheDb#query(CacheQueryProvider)
  * query method} is needed.</p>
  */
-public final class CacheRunner
+public class CacheRunner extends Runner
 {
     private static final String CRLF = "\r\n";
 
-    private static final Predicate<String> FILES = s -> s.toLowerCase().matches(".*\\.(cls|mac|int|inc)$");
-    private static final Predicate<String> SYSEXCLUDE = s -> s.charAt(0) != '%';
-
-    private static final Pattern COMMA = Pattern.compile(",");
-
-    private static final String CLASSDEFINITION_NAME_SQLFIELD = "Name";
-
-    private static final String LOADSTREAM_CLASSNAME = "%SYSTEM.OBJ";
-    private static final String LOADSTREAM_METHODNAME = "LoadStream";
-
-    private static final String LOADFILE_CLASSNAME = "%SYSTEM.OBJ";
-    private static final String LOADFILE_METHODNAME = "Load";
-
-    private static final String WRITECLASSCONTENT_CLASSNAME
-        = "%SYSTEM.OBJ";
-    private static final String WRITECLASSCONTENT_METHODNAME
-        = "ExportUDL";
-
-    private static final String FILE_CLASSNAME = "%File";
-    private static final String FILE_METHODNAME = "TempFilename";
-
     private final CacheDb cacheDb;
+    final Database db;
 
-    public CacheRunner(final CacheDb cacheDb)
+    public CacheRunner(final Connection connection)
+            throws CacheException
     {
-        this.cacheDb = cacheDb;
+        super(connection);
+        this.cacheDb = new CacheDb(connection);
+        this.db = cacheDb.getDatabase();
     }
 
-    /**
-     * List the classes for this database
-     *
-     * @param includeSys also list system classes
-     * @return the set of classes
-     * @throws CacheException Caché error
-     * @throws SQLException SQL error
-     */
-    @SuppressWarnings("OverlyBroadThrowsClause")
-    public Set<String> listClasses(final boolean includeSys)
-        throws CacheException, SQLException
-    {
-        final Set<String> set = new HashSet<>();
-
-        try (
-            final CacheSqlQuery query
-                = cacheDb.query(ClassDefinition::query_Summary);
-            final ResultSet rs = query.execute();
-        ) {
-            while (rs.next()) {
-                final String name = rs.getString(CLASSDEFINITION_NAME_SQLFIELD);
-                /*
-                 * FIXME: meh, that would be better done at the query level
-                 */
-                if (includeSys || name.charAt(0) != '%')
-                    set.add(name);
-            }
-        }
-
-        return Collections.unmodifiableSet(set);
-    }
-
-    /**
-     * Import an XML export as a stream
-     *
-     * <p>This is needed in some situations where the file import does not work.
-     * Unfortunately, with this mode, you cannot reliably get a list of loaded
-     * classes. See <a
-     * href="http://stackoverflow.com/a/35371306/1093528">here</a> for more
-     * details.</p>
-     *
-     * <p>Prefer to use {@link #importFile(Path, boolean)} instead.</p>
-     *
-     * @param path path to the XML export
-     * @throws CacheException Caché error
-     * @throws IOException Failed to read from the XML export
-     */
+    @Override
     public void importStream(final Path path)
         throws CacheException, IOException
     {
-        final Database db = cacheDb.getDatabase();
-
         final CharacterStream stream = new GlobalCharacterStream(db);
         loadContent(stream, path);
 
@@ -188,20 +119,7 @@ public final class CacheRunner
 //        System.out.println("loadedlist: " + loadedlist.getValue());
     }
 
-    /**
-     * Import an XML as a file
-     *
-     * <p>In fact, this creates a file using the Caché API on the remote server,
-     * copies the content of the XML to this file and then imports it. Unlike
-     * what happens with {@link #importStream(Path)}, with this method, you
-     * <em>do</em> get the list of loaded items back.</p>
-     *
-     * @param path path to the XML to import
-     * @param includeSys include system classes
-     * @return the list of loaded classes
-     * @throws CacheException Caché error
-     * @throws IOException Failure to read from the XML export
-     */
+    @Override
     public Set<String> importFile(final Path path, final boolean includeSys)
         throws CacheException, IOException
     {
@@ -304,21 +222,10 @@ public final class CacheRunner
         return Collections.unmodifiableSet(set);
     }
 
-    /**
-     * Write the source code of a Caché class to a file
-     *
-     * <p>The file is written using UTF-8 and {@code \r\n} as a line terminator.
-     * </p>
-     *
-     * @param className the class name
-     * @param path path of the file to write
-     * @throws CacheException Caché error
-     * @throws IOException Write failure
-     */
+    @Override
     public void writeClassContent(final String className, final Path path)
         throws CacheException, IOException
     {
-        final Database db = cacheDb.getDatabase();
 
         final int[] byRefs = new int[0];
 
@@ -347,32 +254,12 @@ public final class CacheRunner
     }
 
     private String createRemoteTemporaryFileName(String fileExt)
-        throws CacheException
+            throws CacheException
     {
         final Dataholder[] args = { new Dataholder(fileExt) };
         final Dataholder res = cacheDb.getDatabase()
-            .runClassMethod(FILE_CLASSNAME, FILE_METHODNAME, args, 0);
+                .runClassMethod(FILE_CLASSNAME, FILE_METHODNAME, args, 0);
         return res.getString();
     }
 
-    private static void loadContent(final CharacterStream stream,
-        final Path path)
-        throws IOException, CacheException
-    {
-        final StringBuilder sb = new StringBuilder();
-
-        try (
-            final Reader reader = Files.newBufferedReader(path);
-        ) {
-            final char[] buf = new char[2048];
-            int nrChars;
-
-            while ((nrChars = reader.read(buf)) != -1)
-                sb.append(buf, 0, nrChars);
-        }
-
-        // Note that we don't _rewind() the stream; the loading function does
-        // that by itself
-        stream._write(sb.toString());
-    }
 }

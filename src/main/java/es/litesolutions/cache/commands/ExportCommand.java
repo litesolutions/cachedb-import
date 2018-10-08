@@ -1,20 +1,20 @@
 package es.litesolutions.cache.commands;
 
 import com.intersys.objects.CacheException;
-import es.litesolutions.cache.db.CacheDb;
 import es.litesolutions.cache.Util;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * Export command: write the source of all classes to a given directory
+ * Export command: write the source of all classes/routines to a given directory
  */
 public final class ExportCommand
     extends CachedbCommand
@@ -29,10 +29,11 @@ public final class ExportCommand
     private final Path outputDir;
     private final boolean overwrite;
 
-    public ExportCommand(final CacheDb cacheDb,
+    public ExportCommand(final Connection connection, String restUrl,
         final Map<String, String> arguments)
+            throws CacheException
     {
-        super(cacheDb, arguments);
+        super(connection, restUrl, arguments);
         outputDir = Paths.get(getArgument(OUTPUTDIR)).toAbsolutePath();
         overwrite = Boolean.parseBoolean(getArgumentOrDefault(OVERWRITE,
             OVERWRITE_DEFAULT));
@@ -44,9 +45,9 @@ public final class ExportCommand
     {
         prepareDirectory();
 
-        final Set<String> classes = runner.listClasses(includeSys);
+        final Set<String> items = runner.listItems(includeSys);
 
-        writeClasses(classes);
+        writeItems(items);
     }
 
     void prepareDirectory()
@@ -63,21 +64,22 @@ public final class ExportCommand
         Files.createDirectories(outputDir);
     }
 
-    void writeClasses(final Set<String> classes)
+    void writeItems(final Set<String> items)
         throws CacheException, IOException
     {
         Path out;
 
-        for (final String className: classes) {
-            out = computePath(className);
+        for (final String itemName: items) {
+            final String itemFileName = itemName;
+            out = computePath(itemFileName);
             Files.createDirectories(out.getParent());
-            runner.writeClassContent(className, out);
+            runner.writeClassContent(itemFileName, out);
         }
     }
 
-    private Path computePath(final String className) throws IOException
+    private Path computePath(final String itemName) throws IOException
     {
-        final String[] parts = DOT.split(className);
+        final String[] parts = DOT.split(itemName);
         final String ext = parts[parts.length - 1];
         final int len = parts.length - 1;
         final String lastPart = parts[len - 1];

@@ -7,6 +7,8 @@ import com.intersys.objects.CacheException;
 import com.intersys.objects.CacheQuery;
 import com.intersys.objects.Database;
 
+import java.sql.Connection;
+
 /**
  * Wrapper over a Caché {@link Database}
  *
@@ -28,23 +30,20 @@ public final class CacheDb
     /**
      * Constructor
      *
-     * @param jdbcUrl the JDBC URL (jdbc://Cache/etcetc)
-     * @param user the user
-     * @param password the password
-     * @throws CacheException failure to open the database
+     * @param connection - Connection
+     * @throws CacheException
      */
-    public CacheDb(final String jdbcUrl, final String user,
-        final String password)
-        throws CacheException
+    public CacheDb(Connection connection)
+            throws CacheException
     {
-        database = CacheDatabase.getDatabase(jdbcUrl, user, password);
+        this.database = CacheDatabase.getDatabase(connection);
 
         /*
          * Set the session language to English
          */
         final Dataholder[] holders = { Dataholder.create(LANG) };
         database.runClassMethod(CLASSNAME, METHODNAME, holders,
-            Database.RET_NONE);
+                Database.RET_NONE);
     }
 
     /**

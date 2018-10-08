@@ -1,10 +1,9 @@
 package es.litesolutions.cache.commands;
 
-import es.litesolutions.cache.CacheImport;
-import es.litesolutions.cache.db.CacheDb;
-import es.litesolutions.cache.CacheRunner;
-import es.litesolutions.cache.Util;
+import com.intersys.objects.CacheException;
+import es.litesolutions.cache.*;
 
+import java.sql.Connection;
 import java.util.Map;
 
 /**
@@ -15,8 +14,7 @@ public abstract class CachedbCommand
     protected static final String INCLUDESYS = "includeSys";
     protected static final String INCLUDESYS_DEFAULT = "true";
 
-    protected final CacheDb cacheDb;
-    protected final CacheRunner runner;
+    protected final Runner runner;
     protected final Map<String, String> arguments;
 
     protected final boolean includeSys;
@@ -24,15 +22,15 @@ public abstract class CachedbCommand
     /**
      * Constructor
      *
-     * @param cacheDb the database
+     * @param connection the database
      * @param arguments map of arguments
      */
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
-    protected CachedbCommand(final CacheDb cacheDb,
+    protected CachedbCommand(final Connection connection, String restUrl,
         final Map<String, String> arguments)
+        throws CacheException
     {
-        this.cacheDb = cacheDb;
-        runner = new CacheRunner(cacheDb);
+        runner = connection == null ? new RESTRunner(restUrl) : new CacheRunner(connection);
         this.arguments = arguments;
 
         includeSys = Boolean.parseBoolean(Util.readOrDefault(INCLUDESYS,

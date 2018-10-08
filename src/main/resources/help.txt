@@ -6,7 +6,7 @@ Syntax:
 
 The command argument is mandatory.
 
-Available commands are: listClasses, export, import, gensrc.
+Available commands are: listItems, export, import, gensrc.
 
 Arguments common to all commands:
 
@@ -28,6 +28,15 @@ Arguments common to all commands:
 
         Specify the port to connect to. If not specified, the default is 1972.
 
+    * webport=webport [OPTIONAL]
+
+        Specify the port to connect to. If not specified, the default is empty.
+        If specified used Atelier API.
+
+    * webusessl=true [OPTIONAL]
+
+        Set to true if should be used SSL access.
+
     * user=dbuser [MANDATORY]
 
          Specify the user with which to connect to the database.
@@ -45,4 +54,4 @@ Arguments common to all commands:
         Also import/list/export "sysem" classes; that is, classes whose name
         starts with a % sign.
 
-        The default is false.
+        The default is true.

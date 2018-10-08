@@ -1,7 +1,6 @@
 package es.litesolutions.cache.commands;
 
 import com.intersys.objects.CacheException;
-import es.litesolutions.cache.db.CacheDb;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -9,13 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,10 +32,11 @@ public final class ImportCommand
     private final List<Path> files;
     private final String mode;
 
-    public ImportCommand(final CacheDb cacheDb,
+    public ImportCommand(final Connection connection, String restUrl,
         final Map<String, String> arguments)
+            throws CacheException
     {
-        super(cacheDb, arguments);
+        super(connection, restUrl, arguments);
 
         final String inputFile = arguments.get(INPUT_FILE);
         final String inputDir = arguments.get(INPUT_DIR);
@@ -57,6 +53,16 @@ public final class ImportCommand
                 System.err.println("Unknown import mode " + mode);
                 System.exit(2);
         }
+    }
+
+    public ImportCommand(String restUrl, Map<String, String> arguments) throws CacheException, SQLException
+    {
+        this(null, restUrl, arguments);
+    }
+
+    public ImportCommand(Connection connection, Map<String, String> arguments) throws CacheException, SQLException
+    {
+        this(connection, "", arguments);
     }
 
     @Override
@@ -102,9 +108,9 @@ public final class ImportCommand
     private Set<String> importStreamAndList()
         throws CacheException, SQLException, IOException
     {
-        final Set<String> before = runner.listClasses(includeSys);
+        final Set<String> before = runner.listItems(includeSys);
         importStream();
-        final Set<String> after = new HashSet<>(runner.listClasses(includeSys));
+        final Set<String> after = new HashSet<>(runner.listItems(includeSys));
         after.removeAll(before);
         return Collections.unmodifiableSet(after);
     }

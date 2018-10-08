@@ -1,0 +1,16 @@
+Syntax:
+
+    java <javaoptions> listItems
+
+This command lists all classes/routines for the specified database, namespace, user and
+password, except system.
+
+See:
+
+    java <javaoptions> help
+
+for a list of global arguments.
+
+Arguments:
+
+    NONE
