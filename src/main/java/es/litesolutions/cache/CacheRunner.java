@@ -123,6 +123,7 @@ public class CacheRunner extends Runner
     public Set<String> importFile(final Path path, final boolean includeSys)
         throws CacheException, IOException
     {
+        System.out.printf("Import from '%s'\n", path);
         final String tempFileName = createRemoteTemporaryFileName("xml");
 
         final Database db = cacheDb.getDatabase();
@@ -180,30 +181,35 @@ public class CacheRunner extends Runner
         // arg 9: description (?)
         arguments[8] = Dataholder.create(description.value);
 
-        // Now, make the call
-        final Dataholder[] result = db.runClassMethod(
-            LOADFILE_CLASSNAME,
-            LOADFILE_METHODNAME,
-            byRefArgs,
-            arguments,
-            Database.RET_PRIM
-        );
+        try {
+            // Now, make the call
+            final Dataholder[] result = db.runClassMethod(
+                    LOADFILE_CLASSNAME,
+                    LOADFILE_METHODNAME,
+                    byRefArgs,
+                    arguments,
+                    Database.RET_PRIM
+            );
 
-        /*
-         * The result normally has three members:
-         *
-         * - first is the status; and we need to do that:
-         */
-        db.parseStatus(result[0]);
+            /*
+             * The result normally has three members:
+             *
+             * - first is the status; and we need to do that:
+             */
+            db.parseStatus(result[0]);
 
-        /*
-         * - others are ByRef arguments
-         */
-        // TODO
+            /*
+             * - others are ByRef arguments
+             */
+            // TODO
 //        errorlog.set(result[1].getString());
 //        System.out.println("errorlog: " + errorlog.getValue());
 
-        loadedlist.set(result[2].getString());
+            loadedlist.set(result[2].getString());
+        } catch (Exception ex) {
+            System.out.println("Error loading file: " + ex.getLocalizedMessage());
+            return Collections.emptySet();
+        }
 
         Predicate<String> predicate = FILES;
         if (!includeSys)
@@ -223,27 +229,61 @@ public class CacheRunner extends Runner
     }
 
     @Override
-    public void writeClassContent(final String className, final Path path)
+    public void writeClassContent(final String itemName, final Path path)
         throws CacheException, IOException
     {
-
-        final int[] byRefs = new int[0];
-
         final String tempFileName = createRemoteTemporaryFileName("txt");
 
-        final Dataholder[] arguments = new Dataholder[2];
-        arguments[0] = new Dataholder(className);
-        arguments[1] = new Dataholder(tempFileName);
+        int versionMajor = 2016;
+        int versionMinor = 2;
+        try {
+            versionMajor = connection.getMetaData().getDatabaseMajorVersion();
+            versionMinor = connection.getMetaData().getDatabaseMinorVersion();
+        } catch (Exception e) {
+        }
+        if (versionMajor < 2016 || (versionMajor == 2016 && versionMinor < 2)) {
+            if (itemName.toLowerCase().endsWith("cls")) {
+                System.out.printf("Export '%s' to '%s'\n", itemName, path);
 
-        final Dataholder[] res = db.runClassMethod(
-            WRITECLASSCONTENT_CLASSNAME,
-            WRITECLASSCONTENT_METHODNAME,
-            byRefs,
-            arguments,
-            Database.RET_PRIM
-        );
+                String className = itemName.substring(0, itemName.length() - 4);
 
-        db.parseStatus(res[0]);
+                final int[] byRefs = new int[0];
+
+                final Dataholder[] arguments = new Dataholder[3];
+                arguments[0] = new Dataholder((String) null);
+                arguments[1] = new Dataholder(className);
+                arguments[2] = new Dataholder(tempFileName);
+
+                final Dataholder[] res = db.runClassMethod(
+                        "%Compiler.UDL.TextServices",
+                        "GetTextAsFile",
+                        byRefs,
+                        arguments,
+                        Database.RET_PRIM
+                );
+
+                db.parseStatus(res[0]);
+            }
+        } else {
+            System.out.printf("Export '%s' to '%s'\n", itemName, path);
+
+
+            final int[] byRefs = new int[0];
+
+            final Dataholder[] arguments = new Dataholder[2];
+            arguments[0] = new Dataholder(itemName);
+            arguments[1] = new Dataholder(tempFileName);
+
+            final Dataholder[] res = db.runClassMethod(
+                    WRITECLASSCONTENT_CLASSNAME,
+                    WRITECLASSCONTENT_METHODNAME,
+                    byRefs,
+                    arguments,
+                    Database.RET_PRIM
+            );
+
+            db.parseStatus(res[0]);
+        }
 
         final FileBinaryStream stream = new FileBinaryStream(db);
         stream._filenameSet(tempFileName);
