@@ -20,9 +20,9 @@ to build it yourself; see the instructions below.
 
 ## Requisites
 
-* Caché database 2016.2.
+* Caché database 2014.1 or higher, including IRIS Data Platform.
 
-## How to use
+## How to build
 
 * Clone this project.
 * Have a JDK 8 install.
@@ -38,7 +38,7 @@ The generated jar is fully contained, and generated as
 You can view a global help with:
 
 ```
-java -jar build/libs/cachedb-import.jar help
+java -jar build/libs/cachedb-import-0.2.jar help
 ```
 
 It is recommended that you use a property file with the following keys, so that
@@ -46,18 +46,25 @@ the command line is not too long, and reuse it across your commands:
 
 
 ```
-# Host where the Caché installation is.
-# If not specified, the default is localhost.
-host = some.host.somewhere
-# Port to connect to.
-# If not specified, the default is 1972.
-port = 1972
+# Host where the Caché installation is
+# If not specified, the default is localhost
+host=some.host.somewhere
+# Port to connect to
+# If not specified, the default is 1972
+port=1972
 # REQUIRED: Caché user
-user = theuser
+user=theuser
 # REQUIRED: the password
-password = thepassword
+password=thepassword
 # REQUIRED: the namespace
-namespace = THENAMESPACE
+namespace=THENAMESPACE
+# OPTIONAL: Specify the port to connect to
+# If not specified, the default is empty
+# Default webport in Caché and Ensemble is 57772
+# Default webport in IRIS is 52773
+webport=
+# OPTIONAL: Set to true if should be used SSL access
+webusessl=true
 ```
 
 Say this file is named `/tmp/db.properties`; if you have, for instance, an XML
