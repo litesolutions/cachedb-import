@@ -58,7 +58,9 @@ user=theuser
 password=thepassword
 # REQUIRED: the namespace
 namespace=THENAMESPACE
-# OPTIONAL: Specify the port to connect to
+# OPTIONAL if you connect to Caché Database
+# REQUIRED if you connect to IRIS Data Platform
+# Don't use if for previous versions to Caché 2016.2
 # If not specified, the default is empty
 # Default webport in Caché and Ensemble is 57772
 # Default webport in IRIS is 52773
@@ -72,7 +74,7 @@ export file named `/tmp/myexport.xml` and want to generate the sources in
 directory `/tmp/sources`, you will use this command line:
 
 ```
-java -jar build/libs/cachedb-import.jar gensrc cfg=/tmp/db.properties
+java -jar build/libs/cachedb-import-0.2.jar gensrc cfg=/tmp/db.properties
     inputFile=/tmp/myexport.xml outputDir=/tmp/sources
 ```
 
