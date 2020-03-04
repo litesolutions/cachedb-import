@@ -15,8 +15,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -27,10 +26,13 @@ public class RESTRunner extends Runner {
 
     final String[] SYSTEMDB = {"CACHELIB", "IRISLIB", "CACHESYS", "IRISSYS"};
 
+    final CookieManager cm;
+
     public RESTRunner(String url)
     {
         super(null);
         this.url = url;
+        this.cm = new CookieManager();
     }
 
     @Override
@@ -182,6 +184,13 @@ public class RESTRunner extends Runner {
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(5000);
 
+        StringBuilder cookieBuilder = new StringBuilder();
+        List<HttpCookie> cookies = this.cm.getCookieStore().getCookies();
+        for (int i = 0; i < cookies.size(); i++) {
+            cookieBuilder.append("; ").append(cookies.get(i).toString());
+        }
+        connection.setRequestProperty("Cookie", cookieBuilder.toString());
+
         if (data != null) {
             connection.setRequestProperty("Content-Type", "application/json");
             OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
@@ -190,6 +199,13 @@ public class RESTRunner extends Runner {
         }
 
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+        List<String> cookiesHeader = connection.getHeaderFields().get("SET-COOKIE");
+        if (cookiesHeader != null) {
+            for (String cookie : cookiesHeader) {
+                this.cm.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+            }
+        }
 
         String inputLine;
         StringBuffer content = new StringBuffer();

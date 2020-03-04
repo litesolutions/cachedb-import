@@ -1,55 +1,50 @@
 buildscript {
     repositories {
-        jcenter();
+        jcenter()
     }
     dependencies {
-        classpath(group: "com.github.jengelman.gradle.plugins", name: "shadow", version: "1.2.3");
+        classpath(group: "com.github.jengelman.gradle.plugins", name: "shadow", version: "5.2.0")
     }
 }
 
 repositories {
-    mavenCentral();
+    mavenCentral()
 }
 
-apply(plugin: "idea");
-apply(plugin: "java");
-apply(plugin: "application");
-apply(plugin: "com.github.johnrengelman.shadow");
+apply(plugin: "idea")
+apply(plugin: "java")
+apply(plugin: "application")
+apply(plugin: "com.github.johnrengelman.shadow")
 
-group = "es.litesolutions";
-version = "0.2.0-SNAPSHOT";
-description = "Read an XML export, write as COS source files";
+group = "es.litesolutions"
+version = project.hasProperty('version') ? project['version'] : "0.2.0-SNAPSHOT"
+description = "Read an XML export, write as COS source files"
 
-def javaVersion = JavaVersion.VERSION_1_8;
-sourceCompatibility = javaVersion;
-targetCompatibility = javaVersion; // defaults to sourceCompatibility
+def javaVersion = JavaVersion.VERSION_1_8
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion // defaults to sourceCompatibility
 
 dependencies {
-    compile fileTree("lib");
-    compile group: "org.json", name: "json", version: "20180813";
+    implementation fileTree("lib")
+    implementation group: "org.json", name: "json", version: "20190722"
 }
 
-mainClassName = "es.litesolutions.cache.CacheImport";
+mainClassName = "es.litesolutions.cache.CacheImport"
 
 shadowJar {
-    archiveName = "${project.name}.jar";
+    archiveFileName = "${project.name}.jar"
 }
 
 test {
     useTestNG() {
-        useDefaultListeners = true;
-    };
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = "2.11";
-    distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip";
+        useDefaultListeners = true
+    }
 }
 
 jar {
     manifest {
         attributes(
-                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Class-Path': configurations.compileClasspath,
                 'Main-Class': 'es.litesolutions.cache.CacheImport'
         )
     }

@@ -38,8 +38,9 @@ public final class ImportCommand
     {
         super(connection, restUrl, arguments);
 
-        final String inputFile = arguments.get(INPUT_FILE);
-        final String inputDir = arguments.get(INPUT_DIR);
+        final String inputFileString = getArgumentOrDefault(INPUT_FILE, "");
+        final Path inputFile = inputFileString == "" ? null : Paths.get(inputFileString).toAbsolutePath();
+        final Path inputDir = Paths.get(getArgument(INPUT_DIR)).toAbsolutePath();
 
         files = collectPaths(inputFile, inputDir);
 
@@ -122,8 +123,8 @@ public final class ImportCommand
             runner.importStream(path);
     }
 
-    private static List<Path> collectPaths(final String inputFile,
-        final String inputDir)
+    private static List<Path> collectPaths(final Path inputFile,
+        final Path inputDir)
     {
         if (Stream.of(inputDir, inputFile).allMatch(Objects::isNull)) {
             System.err.println("Missing required argument (either inputFile"
@@ -140,7 +141,7 @@ public final class ImportCommand
         }
 
         if (inputFile != null)
-            return Collections.singletonList(Paths.get(inputFile));
+            return Collections.singletonList(inputFile);
 
         if (inputDir != null)
             try {
@@ -152,15 +153,14 @@ public final class ImportCommand
         throw new Error("Unreachable! How did I get there?");
     }
 
-    private static List<Path> collectFiles(final String inputDir)
+    private static List<Path> collectFiles(final Path inputDir)
         throws IOException
     {
-        final Path dir = Paths.get(inputDir).toRealPath();
         final BiPredicate<Path, BasicFileAttributes> predicate
             = (path, attrs) -> attrs.isRegularFile() && path.getFileName()
             .toString().toLowerCase().endsWith(".xml");
         try (
-            final Stream<Path> stream = Files.find(dir, Integer.MAX_VALUE,
+            final Stream<Path> stream = Files.find(inputDir, Integer.MAX_VALUE,
                 predicate);
         ) {
             return stream.collect(Collectors.toList());
