@@ -40,7 +40,8 @@ public final class ImportCommand
 
         final String inputFileString = getArgumentOrDefault(INPUT_FILE, "");
         final Path inputFile = inputFileString == "" ? null : Paths.get(inputFileString).toAbsolutePath();
-        final Path inputDir = Paths.get(getArgument(INPUT_DIR)).toAbsolutePath();
+        final String inputDirString = getArgumentOrDefault(INPUT_DIR, "");
+        final Path inputDir = inputDirString == "" ? null : Paths.get(inputDirString).toAbsolutePath();
 
         files = collectPaths(inputFile, inputDir);
 
