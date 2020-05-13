@@ -159,7 +159,7 @@ public final class ImportCommand
     {
         final BiPredicate<Path, BasicFileAttributes> predicate
             = (path, attrs) -> attrs.isRegularFile() && path.getFileName()
-            .toString().toLowerCase().endsWith(".xml");
+            .toString().matches("(?i).*\\.(xml|ro)");
         try (
             final Stream<Path> stream = Files.find(inputDir, Integer.MAX_VALUE,
                 predicate);

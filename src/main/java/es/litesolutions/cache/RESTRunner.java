@@ -16,9 +16,12 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.*;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RESTRunner extends Runner {
 
@@ -66,7 +69,12 @@ public class RESTRunner extends Runner {
     {
         byte[] encoded = Files.readAllBytes(path);
         final Set<String> set = new HashSet<>();
-        HashMap<String, String> files = extractItemsFromFile(path);
+        HashMap<String, String> files = new HashMap<>();
+        if (FileSystems.getDefault().getPathMatcher("glob:*.xml").matches(path.getFileName())) {
+            files = extractItemsFromXMLFile(path);
+        } else if (FileSystems.getDefault().getPathMatcher("glob:*.ro").matches(path.getFileName())) {
+            files = extractItemsFromROFile(path);
+        }
 
         for(Map.Entry<String, String> entry : files.entrySet()) {
             String name = entry.getKey();
@@ -83,7 +91,7 @@ public class RESTRunner extends Runner {
         return Collections.unmodifiableSet(set);
     }
 
-    private HashMap<String, String> extractItemsFromFile(Path path)
+    private HashMap<String, String> extractItemsFromXMLFile(Path path)
     {
         HashMap<String, String> files = new HashMap<>();
 
@@ -122,6 +130,51 @@ public class RESTRunner extends Runner {
                 }
                 files.put(name, docToString(newDoc));
             }
+        } catch (Exception e) {
+            System.err.print(e);
+        }
+
+        return files;
+    }
+
+    private HashMap<String, String> extractItemsFromROFile(Path path)
+    {
+        HashMap<String, String> files = new HashMap<>();
+        // Routine^INT^1^65496,84164^0
+        final Pattern routinePattern = Pattern.compile("^([^\\^]+)\\^([^\\^]+)\\^\\d+\\^\\d+,\\d+\\^\\d\\n(.*)", Pattern.DOTALL);
+        // line with only one dot convert to empty line
+        final Pattern codeEmptyLines = Pattern.compile("^.$", Pattern.MULTILINE);
+
+        try (Scanner scanner = new Scanner(path.toFile())) {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setIgnoringElementContentWhitespace(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            String generator = "Cache";
+            String roHeader = scanner.findWithinHorizon("%RO", 0) + scanner.nextLine();
+
+            scanner.useDelimiter(Pattern.compile("\\n\\n(?=.+\\^)"));
+            while (scanner.hasNext()) {
+                String line = scanner.next();
+                Matcher m = routinePattern.matcher(line);
+                if (m.matches()) {
+                    String name = m.group(1) + "." + m.group(2).toLowerCase();
+                    Document newDoc = builder.newDocument();
+                    Element exportNode = newDoc.createElement("Export");
+                    exportNode.setAttribute("generator", generator);
+                    exportNode.setAttribute("version", "25");
+                    Element routineNode = newDoc.createElement("Routine");
+                    routineNode.setAttribute("name", m.group(1));
+                    routineNode.setAttribute("type", m.group(2));
+                    newDoc.appendChild(exportNode);
+                    exportNode.appendChild(routineNode);
+                    String routineContent = codeEmptyLines.matcher(m.group(3)).replaceAll("");
+                    routineNode.appendChild(newDoc.createCDATASection(routineContent));
+                    files.put(name, docToString(newDoc));
+                }
+            }
+
+
         } catch (Exception e) {
             System.err.print(e);
         }
