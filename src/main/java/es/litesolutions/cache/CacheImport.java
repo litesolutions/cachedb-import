@@ -7,6 +7,7 @@ import es.litesolutions.cache.commands.GensrcCommand;
 import es.litesolutions.cache.commands.ImportCommand;
 import es.litesolutions.cache.commands.ListItemsCommand;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -113,7 +114,7 @@ public final class CacheImport
         final String host = Util.readOrDefault(HOST, cfg, HOST_DEFAULT);
         final String port = Util.readOrDefault(PORT, cfg, PORT_DEFAULT);
         final String webport = Util.readOrDefault(WEBPORT, cfg, WEBPORT_DEFAULT);
-        final boolean webusessl = Util.readOrDefault(WEBUSESSL, cfg, WEBUSESSL_DEFAULT) == "true";
+        final boolean webusessl = Util.readOrDefault(WEBUSESSL, cfg, WEBUSESSL_DEFAULT).equals("true");
         final String namespace = Util.readOrDefault(NAMESPACE, cfg, "USER");
 
         final String product = Util.readOrDefault(IRIS, cfg, "").equals("true") ? "IRIS" : "Cache";
@@ -166,6 +167,6 @@ public final class CacheImport
     @FunctionalInterface
     private interface CommandCreator
     {
-        CachedbCommand create(Connection connection, String restUrl, Map<String, String> cfg) throws CacheException, SQLException;
+        CachedbCommand create(Connection connection, String restUrl, Map<String, String> cfg) throws CacheException, SQLException, IOException;
     }
 }

@@ -34,7 +34,7 @@ public final class ImportCommand
 
     public ImportCommand(final Connection connection, String restUrl,
         final Map<String, String> arguments)
-            throws CacheException
+            throws CacheException, IOException
     {
         super(connection, restUrl, arguments);
 
@@ -57,12 +57,12 @@ public final class ImportCommand
         }
     }
 
-    public ImportCommand(String restUrl, Map<String, String> arguments) throws CacheException, SQLException
+    public ImportCommand(String restUrl, Map<String, String> arguments) throws CacheException, IOException
     {
         this(null, restUrl, arguments);
     }
 
-    public ImportCommand(Connection connection, Map<String, String> arguments) throws CacheException, SQLException
+    public ImportCommand(Connection connection, Map<String, String> arguments) throws CacheException, IOException
     {
         this(connection, "", arguments);
     }

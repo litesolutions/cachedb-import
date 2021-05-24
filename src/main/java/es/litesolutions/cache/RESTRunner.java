@@ -15,7 +15,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
-import java.net.*;
+import java.net.CookieManager;
+import java.net.HttpCookie;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,19 +26,23 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class RESTRunner extends Runner {
 
     final String url;
 
     final String[] SYSTEMDB = {"CACHELIB", "IRISLIB", "CACHESYS", "IRISSYS"};
 
-    final CookieManager cm;
+    final static CookieManager cm = new CookieManager();;
 
-    public RESTRunner(String url)
+    final Map<String, String> arguments;
+
+    public RESTRunner(String url, final Map<String, String> arguments) throws IOException
     {
         super(null);
         this.url = url;
-        this.cm = new CookieManager();
+        this.arguments = arguments;
     }
 
     @Override
@@ -52,7 +59,7 @@ public class RESTRunner extends Runner {
         final Set<String> set = new HashSet<>();
 
         JSONArray content = result.getJSONObject("result").getJSONArray("content");
-        for(Object item: content) {
+        for (Object item : content) {
             String name = ((JSONObject) item).getString("name");
             String fromdb = ((JSONObject) item).getString("db");
             if (!includeSys && (name.startsWith("%") || Arrays.stream(SYSTEMDB).anyMatch(fromdb::equals))) {
@@ -76,7 +83,7 @@ public class RESTRunner extends Runner {
             files = extractItemsFromROFile(path);
         }
 
-        for(Map.Entry<String, String> entry : files.entrySet()) {
+        for (Map.Entry<String, String> entry : files.entrySet()) {
             String name = entry.getKey();
             JSONObject request = new JSONObject();
             request.put("enc", false);
@@ -101,11 +108,11 @@ public class RESTRunner extends Runner {
             factory.setIgnoringElementContentWhitespace(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(fis);
-            XPath xPath =  XPathFactory.newInstance().newXPath();
+            XPath xPath = XPathFactory.newInstance().newXPath();
             String expression = "/Export/*";
             NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(
                     doc, XPathConstants.NODESET);
-            for(int i = 0; i < nodeList.getLength(); i++) {
+            for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 String name = node.getAttributes().getNamedItem("name").getNodeValue();
                 String nodeType = node.getNodeName();
@@ -124,7 +131,7 @@ public class RESTRunner extends Runner {
                 newDoc.appendChild(exportNode);
 
                 NamedNodeMap attrs = node.getParentNode().getAttributes();
-                for(int j = 0; j < attrs.getLength(); j++) {
+                for (int j = 0; j < attrs.getLength(); j++) {
                     Node attr = attrs.item(j);
                     ((Element) exportNode).setAttribute(attr.getNodeName(), attr.getNodeValue());
                 }
@@ -182,7 +189,8 @@ public class RESTRunner extends Runner {
         return files;
     }
 
-    private static String docToString(Document doc) {
+    private static String docToString(Document doc)
+    {
         try {
             StringWriter sw = new StringWriter();
             TransformerFactory tf = TransformerFactory.newInstance();
@@ -206,7 +214,7 @@ public class RESTRunner extends Runner {
         JSONObject response = this.get("/doc/" + itemName + "?format=udl");
         JSONArray content = response.getJSONObject("result").getJSONArray("content");
         BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile(), true));
-        for(Object item: content) {
+        for (Object item : content) {
             writer.append(item + "\r\n");
         }
         writer.close();
@@ -239,10 +247,17 @@ public class RESTRunner extends Runner {
 
         StringBuilder cookieBuilder = new StringBuilder();
         List<HttpCookie> cookies = this.cm.getCookieStore().getCookies();
-        for (int i = 0; i < cookies.size(); i++) {
-            cookieBuilder.append("; ").append(cookies.get(i).toString());
+        if (cookies.size() > 0) {
+            for (int i = 0; i < cookies.size(); i++) {
+                cookieBuilder.append("; ").append(cookies.get(i).toString());
+            }
+            connection.setRequestProperty("Cookie", cookieBuilder.toString());
+        } else {
+            String username = this.arguments.get("user");
+            String password = this.arguments.get("password");
+            String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes(UTF_8));
+            connection.setRequestProperty("Authorization", "Basic " + encoded);
         }
-        connection.setRequestProperty("Cookie", cookieBuilder.toString());
 
         if (data != null) {
             connection.setRequestProperty("Content-Type", "application/json");

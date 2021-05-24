@@ -3,6 +3,7 @@ package es.litesolutions.cache.commands;
 import com.intersys.objects.CacheException;
 import es.litesolutions.cache.*;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.Map;
 
@@ -28,9 +29,9 @@ public abstract class CachedbCommand
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     protected CachedbCommand(final Connection connection, String restUrl,
         final Map<String, String> arguments)
-        throws CacheException
+        throws IOException, CacheException
     {
-        runner = connection == null ? new RESTRunner(restUrl) : new CacheRunner(connection);
+        runner = connection == null ? new RESTRunner(restUrl, arguments) : new CacheRunner(connection);
         this.arguments = arguments;
 
         includeSys = Boolean.parseBoolean(Util.readOrDefault(INCLUDESYS,

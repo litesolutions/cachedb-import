@@ -31,7 +31,7 @@ public final class ExportCommand
 
     public ExportCommand(final Connection connection, String restUrl,
         final Map<String, String> arguments)
-            throws CacheException
+            throws CacheException, IOException
     {
         super(connection, restUrl, arguments);
         outputDir = Paths.get(getArgument(OUTPUTDIR)).toAbsolutePath();

@@ -22,7 +22,7 @@ public final class GensrcCommand
 
     public GensrcCommand(final Connection connection, String restUrl,
         final Map<String, String> arguments)
-            throws CacheException
+            throws CacheException, IOException
     {
         super(connection, restUrl, arguments);
         importCommand = new ImportCommand(connection, restUrl, arguments);

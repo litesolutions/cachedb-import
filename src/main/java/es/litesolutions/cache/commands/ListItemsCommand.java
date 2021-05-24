@@ -16,7 +16,7 @@ public final class ListItemsCommand
 {
     public ListItemsCommand(final Connection connection, String restUrl,
                             final Map<String, String> arguments)
-            throws CacheException
+            throws CacheException, IOException
     {
         super(connection, restUrl, arguments);
     }
