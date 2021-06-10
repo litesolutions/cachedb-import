@@ -109,7 +109,7 @@ public class RESTRunner extends Runner {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(fis);
             XPath xPath = XPathFactory.newInstance().newXPath();
-            String expression = "/Export/*";
+            String expression = "/Export/*[local-name()='Class' or local-name()='Routine']";
             NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(
                     doc, XPathConstants.NODESET);
             for (int i = 0; i < nodeList.getLength(); i++) {
@@ -138,7 +138,7 @@ public class RESTRunner extends Runner {
                 files.put(name, docToString(newDoc));
             }
         } catch (Exception e) {
-            System.err.print(e);
+            throw new RuntimeException("Error in during extracting items from XML file: " + path, e);
         }
 
         return files;
@@ -183,7 +183,7 @@ public class RESTRunner extends Runner {
 
 
         } catch (Exception e) {
-            System.err.print(e);
+            throw new RuntimeException("Error in during extracting items from RO file: " + path, e);
         }
 
         return files;

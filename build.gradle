@@ -17,7 +17,7 @@ apply(plugin: "application")
 apply(plugin: "com.github.johnrengelman.shadow")
 
 group = "es.litesolutions"
-version = project.hasProperty('version') ? project['version'] : "0.2.0-SNAPSHOT"
+version = System.getProperty("version", "0.5-SNAPSHOT")
 description = "Read an XML export, write as COS source files"
 
 def javaVersion = JavaVersion.VERSION_1_8
@@ -32,7 +32,7 @@ dependencies {
 mainClassName = "es.litesolutions.cache.CacheImport"
 
 shadowJar {
-    archiveFileName = "${project.name}.jar"
+    archiveFileName = "${project.name}-${version}.jar"
 }
 
 test {
