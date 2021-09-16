@@ -1,7 +1,6 @@
 package es.litesolutions.cache;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.gson.*;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,6 +24,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -55,13 +55,14 @@ public class RESTRunner extends Runner {
     @Override
     public Set<String> listItems(boolean includeSys) throws IOException
     {
-        JSONObject result = this.get("/docnames/*/cls,int,mac,inc?generated=0");
+        JsonObject result = this.get("/docnames/*/cls,int,mac,inc?generated=0");
         final Set<String> set = new HashSet<>();
 
-        JSONArray content = result.getJSONObject("result").getJSONArray("content");
-        for (Object item : content) {
-            String name = ((JSONObject) item).getString("name");
-            String fromdb = ((JSONObject) item).getString("db");
+        JsonArray content = result.getAsJsonObject("result").getAsJsonArray("content");
+        for (JsonElement item : content) {
+            JsonObject itemObj = item.getAsJsonObject();
+            String name = itemObj.get("name").getAsString();
+            String fromdb = itemObj.get("db").getAsString();
             if (!includeSys && (name.startsWith("%") || Arrays.stream(SYSTEMDB).anyMatch(fromdb::equals))) {
                 continue;
             }
@@ -76,6 +77,7 @@ public class RESTRunner extends Runner {
     {
         byte[] encoded = Files.readAllBytes(path);
         final Set<String> set = new HashSet<>();
+//        final HashMap<String, String> errs = new HashMap<>();
         HashMap<String, String> files = new HashMap<>();
         if (FileSystems.getDefault().getPathMatcher("glob:*.xml").matches(path.getFileName())) {
             files = extractItemsFromXMLFile(path);
@@ -85,14 +87,20 @@ public class RESTRunner extends Runner {
 
         for (Map.Entry<String, String> entry : files.entrySet()) {
             String name = entry.getKey();
-            JSONObject request = new JSONObject();
-            request.put("enc", false);
-            JSONArray contentLines = new JSONArray(entry.getValue().split("\n"));
-            request.put("content", contentLines);
+            JsonObject request = new JsonObject();
+            request.addProperty("enc", false);
+            JsonArray contentLines = new JsonArray();
+            Stream.of(entry.getValue().split("\n")).forEach(contentLines::add);
+            request.add("content", contentLines);
 
-            System.out.printf("Import '%s' from '%s'\n", name, path);
-            JSONObject response = this.put("/doc/" + name + "?ignoreConflict=1", request);
-            set.add(name);
+            try {
+                this.put("/doc/" + name + "?ignoreConflict=1", request);
+                System.out.printf("Import '%s' from '%s'\n", name, path);
+                set.add(name);
+            } catch (Exception ex) {
+//                errs.put(name, path.toString());
+                System.out.printf("Failed to Import '%s' from '%s', skipping (%s)\n", name, path, ex.getMessage());
+            }
         }
 
         return Collections.unmodifiableSet(set);
@@ -208,34 +216,36 @@ public class RESTRunner extends Runner {
     }
 
     @Override
-    public void writeClassContent(String itemName, Path path) throws IOException
+    public void writeClassContent(String itemName, Path path)
     {
         System.out.printf("Export '%s' to '%s'\n", itemName, path);
-        JSONObject response = this.get("/doc/" + itemName + "?format=udl");
-        JSONArray content = response.getJSONObject("result").getJSONArray("content");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile(), true));
-        for (Object item : content) {
-            writer.append(item + "\r\n");
+        try {
+            JsonObject response = this.get("/doc/" + itemName + "?format=udl");
+            JsonArray content = response.getAsJsonObject("result").getAsJsonArray("content");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile(), false));
+            for (JsonElement item : content) {
+                writer.append(item.getAsString() + "\r\n");
+            }
+            writer.close();
+        } catch (Exception ex) {
+            System.out.printf("Failed to Export '%s' to '%s', skipping (%s)\n", itemName, path, ex.getMessage());
         }
-        writer.close();
     }
 
-    private JSONObject put(String requestURL, JSONObject data) throws IOException
+    private JsonObject put(String requestURL, JsonObject data) throws IOException
     {
+        try {
+            request("DELETE", requestURL, null);
+        } catch (Exception ex) {}
         return request("PUT", requestURL, data);
     }
 
-    private JSONObject post(String requestURL, JSONObject data) throws IOException
-    {
-        return request("POST", requestURL, data);
-    }
-
-    private JSONObject get(String requestURL) throws IOException
+    private JsonObject get(String requestURL) throws IOException
     {
         return request("GET", requestURL, null);
     }
 
-    private JSONObject request(String method, String requestURL, JSONObject data) throws IOException
+    private JsonObject request(String method, String requestURL, JsonObject data) throws IOException
     {
         URL url = new URL(this.url + requestURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -266,8 +276,6 @@ public class RESTRunner extends Runner {
             out.close();
         }
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
         List<String> cookiesHeader = connection.getHeaderFields().get("SET-COOKIE");
         if (cookiesHeader != null) {
             for (String cookie : cookiesHeader) {
@@ -275,14 +283,29 @@ public class RESTRunner extends Runner {
             }
         }
 
-        String inputLine;
-        StringBuffer content = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
+        BufferedReader in;
+        try {
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        } catch (Exception ex) {
+            in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
         }
-        in.close();
 
-        JSONObject resultObject = new JSONObject(content.toString());
+        JsonObject resultObject = new JsonObject();
+        try {
+            resultObject = JsonParser.parseReader(in).getAsJsonObject();
+        } catch (Exception ex) {
+//            ex.printStackTrace();
+        }
+
+        String status;
+        try {
+            status = resultObject.getAsJsonObject("result").get("status").getAsString();
+        } catch (Exception ex) {
+            status = "Unexpected status: " + connection.getResponseMessage();
+        }
+        if (status.length() > 0) {
+            throw new IOException(status);
+        }
 
         return resultObject;
     }
