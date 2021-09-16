@@ -16,17 +16,15 @@ apply(plugin: "java")
 apply(plugin: "application")
 apply(plugin: "com.github.johnrengelman.shadow")
 
-group = "es.litesolutions"
-version = System.getProperty("version", "0.5-SNAPSHOT")
-description = "Read an XML export, write as COS source files"
-
 def javaVersion = JavaVersion.VERSION_1_8
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion // defaults to sourceCompatibility
 
 dependencies {
     implementation fileTree("lib")
-    implementation group: "org.json", name: "json", version: "20190722"
+//    implementation group: "org.json", name: "json", version: "20190722"
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.8.7'
 }
 
 mainClassName = "es.litesolutions.cache.CacheImport"
