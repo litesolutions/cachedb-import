@@ -16,7 +16,7 @@ apply(plugin: "java")
 apply(plugin: "application")
 apply(plugin: "com.github.johnrengelman.shadow")
 
-def javaVersion = JavaVersion.VERSION_1_8
+def javaVersion = JavaVersion.VERSION_11
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion // defaults to sourceCompatibility
 
