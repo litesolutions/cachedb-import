@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        gradlePluginPortal()
     }
     dependencies {
         classpath(group: "com.github.jengelman.gradle.plugins", name: "shadow", version: "5.2.0")
@@ -16,7 +16,7 @@ apply(plugin: "java")
 apply(plugin: "application")
 apply(plugin: "com.github.johnrengelman.shadow")
 
-def javaVersion = JavaVersion.VERSION_11
+def javaVersion = JavaVersion.VERSION_1_8
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion // defaults to sourceCompatibility
 
@@ -30,7 +30,8 @@ dependencies {
 mainClassName = "es.litesolutions.cache.CacheImport"
 
 shadowJar {
-    archiveFileName = "${project.name}-${version}.jar"
+    archiveBaseName.set(project.name)
+    archiveClassifier.set('')
 }
 
 test {

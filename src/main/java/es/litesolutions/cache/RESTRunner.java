@@ -34,11 +34,11 @@ public class RESTRunner extends Runner {
 
     final String[] SYSTEMDB = {"CACHELIB", "IRISLIB", "CACHESYS", "IRISSYS"};
 
-    final static CookieManager cm = new CookieManager();;
+    final static CookieManager cm = new CookieManager();
 
     final Map<String, String> arguments;
 
-    public RESTRunner(String url, final Map<String, String> arguments) throws IOException
+    public RESTRunner(String url, final Map<String, String> arguments)
     {
         super(null);
         this.url = url;
@@ -46,7 +46,7 @@ public class RESTRunner extends Runner {
     }
 
     @Override
-    public void importStream(Path path) throws IOException
+    public void importStream(Path path)
     {
         System.out.println("importStream: " + path.toString());
 
@@ -63,7 +63,7 @@ public class RESTRunner extends Runner {
             JsonObject itemObj = item.getAsJsonObject();
             String name = itemObj.get("name").getAsString();
             String fromdb = itemObj.get("db").getAsString();
-            if (!includeSys && (name.startsWith("%") || Arrays.stream(SYSTEMDB).anyMatch(fromdb::equals))) {
+            if (!includeSys && (name.startsWith("%") || Arrays.asList(SYSTEMDB).contains(fromdb))) {
                 continue;
             }
             set.add(name);
@@ -133,7 +133,7 @@ public class RESTRunner extends Runner {
                 }
                 Document newDoc = builder.newDocument();
                 newDoc.setXmlStandalone(true);
-                Node exportNode = newDoc.createElement("Export");
+                Element exportNode = newDoc.createElement("Export");
                 Node newNode = node.cloneNode(true);
                 newDoc.adoptNode(newNode);
                 exportNode.appendChild(newDoc.createTextNode("\n"));
@@ -144,7 +144,7 @@ public class RESTRunner extends Runner {
                 NamedNodeMap attrs = node.getParentNode().getAttributes();
                 for (int j = 0; j < attrs.getLength(); j++) {
                     Node attr = attrs.item(j);
-                    ((Element) exportNode).setAttribute(attr.getNodeName(), attr.getNodeValue());
+                    exportNode.setAttribute(attr.getNodeName(), attr.getNodeValue());
                 }
                 files.put(name, docToString(newDoc));
             }
@@ -230,7 +230,7 @@ public class RESTRunner extends Runner {
             JsonArray content = response.getAsJsonObject("result").getAsJsonArray("content");
             BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile(), false));
             for (JsonElement item : content) {
-                writer.append(item.getAsString() + "\r\n");
+                writer.append(item.getAsString()).append("\r\n");
             }
             writer.close();
         } catch (Exception ex) {
@@ -262,10 +262,10 @@ public class RESTRunner extends Runner {
         connection.setReadTimeout(5000);
 
         StringBuilder cookieBuilder = new StringBuilder();
-        List<HttpCookie> cookies = this.cm.getCookieStore().getCookies();
+        List<HttpCookie> cookies = cm.getCookieStore().getCookies();
         if (cookies.size() > 0) {
-            for (int i = 0; i < cookies.size(); i++) {
-                cookieBuilder.append("; ").append(cookies.get(i).toString());
+            for (HttpCookie cookie : cookies) {
+                cookieBuilder.append("; ").append(cookie.toString());
             }
             connection.setRequestProperty("Cookie", cookieBuilder.toString());
         } else {
@@ -285,7 +285,7 @@ public class RESTRunner extends Runner {
         List<String> cookiesHeader = connection.getHeaderFields().get("SET-COOKIE");
         if (cookiesHeader != null) {
             for (String cookie : cookiesHeader) {
-                this.cm.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+                cm.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
             }
         }
 
