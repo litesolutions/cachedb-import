@@ -132,10 +132,13 @@ public class RESTRunner extends Runner {
                     continue;
                 }
                 Document newDoc = builder.newDocument();
+                newDoc.setXmlStandalone(true);
                 Node exportNode = newDoc.createElement("Export");
                 Node newNode = node.cloneNode(true);
                 newDoc.adoptNode(newNode);
+                exportNode.appendChild(newDoc.createTextNode("\n"));
                 exportNode.appendChild(newNode);
+                exportNode.appendChild(newDoc.createTextNode("\n"));
                 newDoc.appendChild(exportNode);
 
                 NamedNodeMap attrs = node.getParentNode().getAttributes();
@@ -201,16 +204,18 @@ public class RESTRunner extends Runner {
     {
         try {
             StringWriter sw = new StringWriter();
+            sw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "0");
+            transformer.setOutputProperty(OutputKeys.INDENT, "no");
+//            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "0");
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
             transformer.transform(new DOMSource(doc), new StreamResult(sw));
-            return sw.toString();
+            sw.write("\n");
+            return sw.toString(); // .replaceAll("\r?\n", "\r\n");
         } catch (Exception ex) {
             throw new RuntimeException("Error converting to String", ex);
         }
