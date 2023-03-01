@@ -1,0 +1,27 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - string:
+          id: "sonar token"
+          scope: GLOBAL
+          secret: "{dummy_token}"
+unclassified:
+  sonarGlobalConfiguration:
+    buildWrapperEnabled: false
+    installations:
+    - credentialsId: "sonar token"
+      name: "sonar"
+      serverUrl: "http://sonarqube:9000"
+      triggers:
+        skipScmCause: false
+        skipUpstreamCause: false
+tool:
+  sonarRunnerInstallation:
+    installations:
+    - name: "local"
+      properties:
+      - installSource:
+          installers:
+          - sonarRunnerInstaller:
+              id: "4.8.0.2856"

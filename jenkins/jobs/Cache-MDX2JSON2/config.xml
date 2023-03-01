@@ -1,0 +1,64 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.0.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <refspec>+refs/tags/*:refs/remotes/origin/tags/*</refspec>
+        <url>https://github.com/eduard93/Cache-MDX2JSON.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="empty-list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>rm -rf &quot;/opt/cachedb/output/$JOB_NAME&quot;</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>java -jar /opt/cachedb/cachedb-import.jar gensrc \
+ host=&quot;${IRIS_HOST:-localhost}&quot; \
+ port=&quot;${IRIS_PORT:-1972}&quot; \
+ webport=&quot;${IRIS_WEBPORT:-52773}&quot; \
+ user=&quot;$IRIS_USER&quot; \
+ password=&quot;$IRIS_PASSWORD&quot; \
+ namespace=&quot;${IRIS_NAMESPACE:-USER}&quot; \
+ inputDir=&quot;$WORKSPACE&quot; \
+ outputDir=&quot;$WORKSPACE/output&quot; \
+ overwrite=true</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+    <hudson.plugins.sonar.SonarRunnerBuilder plugin="sonar@2.15">
+      <project></project>
+      <properties>sonar.projectKey=$JOB_NAME
+sonar.projectName=$JOB_NAME
+sonar.sources=output
+sonar.verbose=true
+sonar.lang.patterns.php=**/*.php
+</properties>
+      <javaOpts></javaOpts>
+      <additionalArguments></additionalArguments>
+      <jdk>(Inherit From Job)</jdk>
+      <task></task>
+    </hudson.plugins.sonar.SonarRunnerBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
