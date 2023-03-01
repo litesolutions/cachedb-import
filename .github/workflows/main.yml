@@ -29,8 +29,8 @@ jobs:
           [ $GITHUB_EVENT_NAME == 'push' ] && VERSION+=-beta && VERSION+=.$(($(git tag -l "$VERSION.*" | sed "s/$VERSION//" | sort -nt. -k2 2>/dev/null | tail -1 | rev | cut -d. -f1 | rev)+1))
           [ $GITHUB_EVENT_NAME == 'pull_request' ] && VERSION+=-dev.${{ github.event.pull_request.number }}
           NAME=$(sed -nr 's/rootProject.name ?= ?"?([^"]*)"?/\1/p' settings.gradle)-$VERSION
-          echo ::set-output name=version::$VERSION
-          echo ::set-output name=name::$NAME
+          echo version=$VERSION >> $GITHUB_OUTPUT
+          echo name=$NAME >> $GITHUB_OUTPUT
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Build with Gradle
