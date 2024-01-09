@@ -303,13 +303,16 @@ public class RESTRunner extends Runner {
 //            ex.printStackTrace();
         }
 
-        String status;
+        String status = "";
         try {
-            status = resultObject.getAsJsonObject("result").get("status").getAsString();
+            JsonObject result = resultObject.getAsJsonObject("result");
+            if (result.has("status")) {
+                status = result.get("status").getAsString();
+            }
         } catch (Exception ex) {
             status = "Unexpected status: " + connection.getResponseMessage();
         }
-        if (status.length() > 0) {
+        if (!status.isEmpty()) {
             throw new IOException(status);
         }
 
