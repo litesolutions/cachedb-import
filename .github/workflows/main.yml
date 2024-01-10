@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       - name: Version
-        id: version
+        id: set-version
         run: |
           set -x
           VERSION=$(sed -nr 's/version ?= ?([^-]*).*/\1/p' gradle.properties)
@@ -37,9 +37,9 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Build with Gradle
-        run: ./gradlew -Pversion="${{ steps.version.outputs.version }}" build
-      - name: Create Beta Release
-        if: (github.event_name == 'push')
+        run: ./gradlew -Pversion="${{ steps.set-version.outputs.version }}" build
+      - name: Publish asset
+        if: (github.event_name != 'pull_request')
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.set-version.outputs.version }}
