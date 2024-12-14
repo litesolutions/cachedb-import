@@ -4,7 +4,7 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties/>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.0.0">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.6.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -29,7 +29,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>rm -rf &quot;/opt/cachedb/output/$JOB_NAME&quot;</command>
+      <command>rm -rf &quot;$WORKSPACE/output&quot;</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
@@ -45,18 +45,18 @@
  overwrite=true</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <hudson.plugins.sonar.SonarRunnerBuilder plugin="sonar@2.15">
+    <hudson.plugins.sonar.SonarRunnerBuilder plugin="sonar@2.17.3">
       <project></project>
       <properties>sonar.projectKey=$JOB_NAME
 sonar.projectName=$JOB_NAME
-sonar.sources=output
+sonar.sources=$WORKSPACE/output
 sonar.verbose=true
-sonar.lang.patterns.php=**/*.php
-</properties>
-      <javaOpts></javaOpts>
+sonar.login=admin
+sonar.password=lite
+sonar.lang.patterns.php=**/*.php</properties>
+      <javaOpts>--add-opens=java.base/java.lang=ALL-UNNAMED</javaOpts>
       <additionalArguments></additionalArguments>
       <jdk>(Inherit From Job)</jdk>
-      <task></task>
     </hudson.plugins.sonar.SonarRunnerBuilder>
   </builders>
   <publishers/>

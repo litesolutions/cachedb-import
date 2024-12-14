@@ -4,23 +4,7 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties/>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.6.0">
-    <configVersion>2</configVersion>
-    <userRemoteConfigs>
-      <hudson.plugins.git.UserRemoteConfig>
-        <refspec>+refs/tags/*:refs/remotes/origin/tags/*</refspec>
-        <url>https://github.com/flnaves/airplane</url>
-      </hudson.plugins.git.UserRemoteConfig>
-    </userRemoteConfigs>
-    <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
-      </hudson.plugins.git.BranchSpec>
-    </branches>
-    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <submoduleCfg class="empty-list"/>
-    <extensions/>
-  </scm>
+  <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -28,15 +12,29 @@
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
+    <hudson.tasks.Shell>
+      <command>java -jar /opt/cachedb/cachedb-import.jar export \
+ host=&quot;${IRIS_HOST:-localhost}&quot; \
+ port=&quot;${IRIS_PORT:-1972}&quot; \
+ webport=&quot;${IRIS_WEBPORT:-52773}&quot; \
+ user=&quot;$IRIS_USER&quot; \
+ password=&quot;$IRIS_PASSWORD&quot; \
+ namespace=&quot;${IRIS_NAMESPACE:-USER}&quot; \
+ outputDir=&quot;$WORKSPACE/output&quot; \
+ package=&quot;EnsLib.Amazon&quot; \
+ overwrite=true \
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
     <hudson.plugins.sonar.SonarRunnerBuilder plugin="sonar@2.17.3">
       <project></project>
       <properties>sonar.projectKey=$JOB_NAME
 sonar.projectName=$JOB_NAME
-sonar.sources=.
+sonar.sources=$WORKSPACE/output
 sonar.verbose=true
-sonar.links.scm=https://github.com/flnaves/airplane
 sonar.login=admin
-sonar.password=lite</properties>
+sonar.password=lite
+sonar.lang.patterns.php=**/*.php</properties>
       <javaOpts>--add-opens=java.base/java.lang=ALL-UNNAMED</javaOpts>
       <additionalArguments></additionalArguments>
       <jdk>(Inherit From Job)</jdk>
