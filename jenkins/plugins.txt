@@ -1,5 +1,5 @@
-workflow-aggregator:590.v6a_d052e5a_a_b_5
-configuration-as-code:1670.v564dc8b_982d0
-sonar:2.15
-git:5.0.0
-job-dsl:1.81
+workflow-aggregator:600.vb_57cdd26fdd7
+configuration-as-code:1903.v004d55388f30
+sonar:2.17.3
+git:5.6.0
+job-dsl:1.90
