@@ -300,7 +300,7 @@ public class RESTRunner extends Runner {
         try {
             resultObject = JsonParser.parseReader(in).getAsJsonObject();
         } catch (Exception ex) {
-//            ex.printStackTrace();
+            //ex.printStackTrace();
         }
 
         String status = "";
@@ -310,6 +310,7 @@ public class RESTRunner extends Runner {
                 status = result.get("status").getAsString();
             }
         } catch (Exception ex) {
+        	 ex.printStackTrace();
             status = "Unexpected status: " + connection.getResponseMessage();
         }
         if (!status.isEmpty()) {

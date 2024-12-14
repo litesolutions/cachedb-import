@@ -25,9 +25,11 @@ public final class ExportCommand
 
     private static final String OVERWRITE = "overwrite";
     private static final String OVERWRITE_DEFAULT = "false";
+    private static final String PACKAGE = "package"; // New argument
 
     private final Path outputDir;
     private final boolean overwrite;
+    private final String packageFilter; // Package filter
 
     public ExportCommand(final Connection connection, String restUrl,
         final Map<String, String> arguments)
@@ -37,6 +39,7 @@ public final class ExportCommand
         outputDir = Paths.get(getArgument(OUTPUTDIR)).toAbsolutePath();
         overwrite = Boolean.parseBoolean(getArgumentOrDefault(OVERWRITE,
             OVERWRITE_DEFAULT));
+        packageFilter = getArgumentOrDefault(PACKAGE, ""); // Get package argument, default is empty
     }
 
     @Override
@@ -69,7 +72,12 @@ public final class ExportCommand
     {
         Path out;
 
-        for (final String itemName: items) {
+        for (final String itemName : items) {
+            // Filter items by package
+            if (!packageFilter.isEmpty() && !itemName.startsWith(packageFilter)) {
+                continue;
+            }
+
             final String itemFileName = itemName;
             out = computePath(itemFileName);
             Files.createDirectories(out.getParent());
