@@ -251,73 +251,72 @@ public class RESTRunner extends Runner {
         return request("GET", requestURL, null);
     }
 
-    private JsonObject request(String method, String requestURL, JsonObject data) throws IOException
-    {
+    private JsonObject request(String method, String requestURL, JsonObject data) throws IOException {
         URL url = new URL(this.url + requestURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod(method);
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Accept", "application/json");
-        connection.setConnectTimeout(5000);
-        connection.setReadTimeout(5000);
-
-        StringBuilder cookieBuilder = new StringBuilder();
-        List<HttpCookie> cookies = cm.getCookieStore().getCookies();
-        if (cookies.size() > 0) {
-            for (HttpCookie cookie : cookies) {
-                cookieBuilder.append("; ").append(cookie.toString());
+        
+        try {
+            connection.setRequestMethod(method);
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+        
+            StringBuilder cookieBuilder = new StringBuilder();
+            List<HttpCookie> cookies = cm.getCookieStore().getCookies();
+            if (!cookies.isEmpty()) {
+                for (HttpCookie cookie : cookies) {
+                    cookieBuilder.append("; ").append(cookie.toString());
+                }
+                connection.setRequestProperty("Cookie", cookieBuilder.toString());
+            } else {
+                String username = this.arguments.get("user");
+                String password = this.arguments.get("password");
+                String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes(UTF_8));
+                connection.setRequestProperty("Authorization", "Basic " + encoded);
             }
-            connection.setRequestProperty("Cookie", cookieBuilder.toString());
-        } else {
-            String username = this.arguments.get("user");
-            String password = this.arguments.get("password");
-            String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes(UTF_8));
-            connection.setRequestProperty("Authorization", "Basic " + encoded);
-        }
-
-        if (data != null) {
-            connection.setRequestProperty("Content-Type", "application/json");
-            OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-            out.write(data.toString());
-            out.close();
-        }
-
-        List<String> cookiesHeader = connection.getHeaderFields().get("SET-COOKIE");
-        if (cookiesHeader != null) {
-            for (String cookie : cookiesHeader) {
-                cm.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+        
+            if (data != null) {
+                connection.setRequestProperty("Content-Type", "application/json");
+                try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), UTF_8)) {
+                    out.write(data.toString());
+                    out.flush();
+                }
             }
-        }
-
-        BufferedReader in;
-        try {
-            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        } catch (Exception ex) {
-            in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-        }
-
-        JsonObject resultObject = new JsonObject();
-        try {
-            resultObject = JsonParser.parseReader(in).getAsJsonObject();
-        } catch (Exception ex) {
-            //ex.printStackTrace();
-        }
-
-        String status = "";
-        try {
+        
+            // Manejar cookies de respuesta
+            List<String> cookiesHeader = connection.getHeaderFields().get("SET-COOKIE");
+            if (cookiesHeader != null) {
+                for (String cookie : cookiesHeader) {
+                    cm.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+                }
+            }
+        
+            // Leer respuesta
+            JsonObject resultObject = new JsonObject();
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(
+                    connection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST 
+                    ? connection.getInputStream() 
+                    : connection.getErrorStream(), UTF_8))) {
+                resultObject = JsonParser.parseReader(in).getAsJsonObject();
+            } catch (Exception ex) {
+                System.err.println("Error parsing response JSON: " + ex.getMessage());
+            }
+        
+            // Validar respuesta
+            if (resultObject == null || !resultObject.has("result")) {
+                throw new IOException("Invalid response from server: " + connection.getResponseMessage());
+            }
+        
             JsonObject result = resultObject.getAsJsonObject("result");
-            if (result.has("status")) {
-                status = result.get("status").getAsString();
+            if (result.has("status") && !"".equals(result.get("status").getAsString())) {
+                throw new IOException("Error from server: " + result.get("status").getAsString());
             }
-        } catch (Exception ex) {
-        	 ex.printStackTrace();
-            status = "Unexpected status: " + connection.getResponseMessage();
+        
+            return resultObject;
+        } finally {
+            connection.disconnect(); // Cierra la conexión y libera recursos
         }
-        if (!status.isEmpty()) {
-            throw new IOException(status);
-        }
-
-        return resultObject;
     }
-
+    
 }
