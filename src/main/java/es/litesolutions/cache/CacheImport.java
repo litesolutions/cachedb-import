@@ -136,7 +136,6 @@ public final class CacheImport
                     final Connection connection = drv.connect(jdbcUrl, props);
             ) {
                 creator.create(connection, "", cfg).execute();
-                connection.close();
             }
         } else {
             final String restUrl = String.format(REST_URL_TEMPLATE, webusessl ? "https" : "http", host, webport, namespace);
