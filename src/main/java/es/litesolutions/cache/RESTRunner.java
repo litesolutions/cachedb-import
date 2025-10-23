@@ -290,7 +290,7 @@ public class RESTRunner extends Runner {
             }
     
             // Manejar cookies de respuesta y almacenarlas en el CookieManager
-            List<String> cookiesHeader = connection.getHeaderFields().get("Set-Cookie");
+            List<String> cookiesHeader = connection.getHeaderFields().get("SET-COOKIE");
             if (cookiesHeader != null) {
                 for (String cookie : cookiesHeader) {
                     cm.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
