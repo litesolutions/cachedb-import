@@ -36,7 +36,7 @@ jobs:
           echo version=$VERSION >> $GITHUB_OUTPUT
           echo name=$NAME >> $GITHUB_OUTPUT
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/wrapper-validation-action@v2
       - name: Build with Gradle
         run: ./gradlew -Pversion="${{ steps.set-version.outputs.version }}" build
       - name: Publish asset
