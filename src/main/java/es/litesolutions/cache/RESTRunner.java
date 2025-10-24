@@ -262,9 +262,7 @@ public class RESTRunner extends Runner {
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
     
-            //  Imprimir cookies antes de la petición
-            System.out.println("Cookies antes de la petición: " + cm.getCookieStore().getCookies());
-    
+               
             // Añadir cookies si existen
             StringBuilder cookieBuilder = new StringBuilder();
             List<HttpCookie> cookies = cm.getCookieStore().getCookies();
@@ -297,9 +295,7 @@ public class RESTRunner extends Runner {
                 }
             }
     
-            //  Imprimir cookies después de la petición
-            System.out.println("Cookies después de la petición: " + cm.getCookieStore().getCookies());
-    
+            
             // Leer respuesta
             JsonObject resultObject;
             try (BufferedReader in = new BufferedReader(new InputStreamReader(
