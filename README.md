@@ -80,7 +80,7 @@ java -jar build/libs/cachedb-import-0.2.jar gensrc cfg=/tmp/db.properties
 
 Please see the help for more options.
 
-## Limitations
+## Limitations...
 
 ### Stream import (`mode=stream`) has limits
 
